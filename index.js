@@ -160,8 +160,8 @@ class Wikic {
   }
 
   fillInfo({ data, config }) {
-    const { _types, title, _address } = config
-
+    const { _types, title, _address, hide } = config
+    if (hide) return { data, config }
     if (typeof this.docsInfos !== 'object' && !this.docsInfos) this.docsInfos = {}
     const docInfo = {
       address: _address,
