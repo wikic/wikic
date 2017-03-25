@@ -1,8 +1,8 @@
 {
-  "name": "wiki",
+  "name": "wikic",
   "version": "1.0.0",
   "private": true,
-  "description": "personal wiki",
+  "description": "a static wiki generator",
   "main": "index.js",
   "author": "dgeibi",
   "license": "MIT",
@@ -32,5 +32,6 @@
     "eslint-config-dgeibi": "dgeibi/eslint-config-dgeibi",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-no-async-without-await": "^1.2.0"
-  }
+  },
+  "repository": "git@github.com:dgeibi/wikic.git"
 }
