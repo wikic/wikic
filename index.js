@@ -26,11 +26,11 @@ const defaultConfig = {
   root: '.',
   docsPath: '_note',
   title: '',
-  docsLayout: 'docs',
+  layout: 'docs',
+  overwriteIndex: false,
   indexLayout: 'index',
   baseurl: '',
   port: 4000,
-  overwriteIndex: false,
   layoutPath: '_layouts',
   publicPath: 'docs',
   excludes: [],
@@ -41,7 +41,7 @@ class Wikic {
   constructor() {
     this.config = Object.assign({}, defaultConfig)
     this.setup()
-    this.writeMarkdown = this.writeMarkdown.bind(this)
+    this.writeDocs = this.writeDocs.bind(this)
     this.writeIndex = this.writeIndex.bind(this)
     this.buildStaticFile = this.buildStaticFile.bind(this)
     this.renderDocs = this.renderDocs.bind(this)
@@ -196,11 +196,11 @@ class Wikic {
   }
 
   renderDocs({ data, config }) {
-    const { docsLayout, title, _types } = config
+    const { layout, title, _types } = config
     const navbar = getNav(_types, this)
     const type = _types.map(this.typeMap).join(' - ')
     const page = { title }
-    const html = renderer.render(`${docsLayout}.njk`, {
+    const html = renderer.render(`${layout}.njk`, {
       content: data,
       navbar,
       type,
@@ -209,10 +209,11 @@ class Wikic {
     return html
   }
 
+
   buildDocs() {
     this.docsInfos = {}
     return glob('**/*.md', { cwd: this.docsPath })
-      .then(files => Promise.all(files.map(this.writeMarkdown)))
+      .then(files => Promise.all(files.map(this.writeDocs)))
   }
 
   async render() {
@@ -228,29 +229,21 @@ class Wikic {
     await Promise.all(dirs.map(this.writeIndex))
   }
 
-  writeMarkdown(file) {
+  writeDocs(file) {
     const targetRelative = file.replace(/\.md$/, '.html')
 
-    const fileFullPath = path.join(this.docsPath, file)
-    const target = path.join(this.publicPath, targetRelative)
+    const from = path.join(this.docsPath, file)
+    const to = path.join(this.publicPath, targetRelative)
 
     const _types = path.dirname(file).split('/')
     const _address = path.join('/', targetRelative)
     const config = Object.assign({}, this.config, { _types, _address })
-
-    return load({
-      fileFullPath,
-      defaultConfig: config,
-      configFileName,
-    })
-      .then(fmFilter)
-      .then(mdFilter)
+    const callback = info => Promise.resolve(info)
       .then(this.fillInfo)
       .then(this.renderDocs)
       .then(addTOC)
-      .then(htmlclean)
-      .then(html => fsp.outputFile(target, html))
-      .catch(e => logger.error(e))
+
+    return Wikic.writeMD({ from, to, config, callback })
   }
 
   writeIndex(dir) {
@@ -259,17 +252,23 @@ class Wikic {
     const target = path.join(this.publicPath, dirname, 'index.html')
     const _address = path.join('/', dirname, '/')
     const config = Object.assign({}, this.config, { _types, _address })
-    return Promise.resolve()
-      .then(() => this.renderIndex({ config }))
+    return Promise.resolve({ config })
+      .then(this.renderIndex)
       .then(htmlclean)
       .then(html => fsp.outputFile(target, html))
       .catch(e => logger.error(e))
   }
 
-  buildStaticFile(filePath) {
+  async buildStaticFile(filePath) {
     const from = path.join(this.root, filePath)
-    const to = path.join(this.publicPath, filePath)
-    return fsp.copy(from, to)
+    let to = path.join(this.publicPath, filePath)
+    if (Wikic.isMarkdown(from)) {
+      const config = Object.assign({}, this.config)
+      to = to.replace(/\.md$/, '.html')
+      await Wikic.writeMD({ from, to, config })
+    } else {
+      await fsp.copy(from, to)
+    }
   }
 
   async buildStaticFiles() {
@@ -294,3 +293,32 @@ class Wikic {
 }
 
 module.exports = Wikic
+
+Wikic.isMarkdown = function isMarkdown(file) {
+  return /\.md$/.test(file)
+}
+
+Wikic.renderMD = function renderMD({ data, config }) {
+  const { layout, title } = config
+  const page = { title }
+  const html = renderer.render(`${layout}.njk`, {
+    content: data,
+    page,
+  })
+  return html
+}
+
+/**
+ * from: fullPath, to: fullPath, callback: ({data, config}) => data
+ */
+Wikic.writeMD = async function writeMD({ from, to, config, callback = Wikic.renderMD }) {
+  const info = await load({
+    configFileName,
+    fileFullPath: from,
+    defaultConfig: config,
+  })
+    .then(fmFilter)
+    .then(mdFilter)
+  const html = htmlclean(await callback(info))
+  await fsp.outputFile(to, html)
+}
