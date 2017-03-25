@@ -1,0 +1,36 @@
+{
+  "name": "wiki",
+  "version": "1.0.0",
+  "private": true,
+  "description": "personal wiki",
+  "main": "index.js",
+  "author": "dgeibi",
+  "license": "MIT",
+  "scripts": {
+    "start": "cd source && node index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "chokidar": "^1.6.1",
+    "find-parent-dir": "^0.3.0",
+    "front-matter": "^2.1.2",
+    "fs-promise": "^2.0.0",
+    "glob": "^7.1.1",
+    "highlight.js": "^9.10.0",
+    "html-toc": "dgeibi/html-toc",
+    "htmlclean": "^2.7.10",
+    "js-yaml": "^3.8.2",
+    "markdown-it": "^8.3.1",
+    "nunjucks": "^3.0.0",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.18.0",
+    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint-config-dgeibi": "dgeibi/eslint-config-dgeibi",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-no-async-without-await": "^1.2.0"
+  }
+}

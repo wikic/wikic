@@ -1,0 +1,10 @@
+{% extends "default.njk" %}
+
+{% block body %}
+{{ navbar }}
+{{ content }}
+{% endblock %}
+
+{% block title %}
+  <title>{{ type }} | {{ site.title }}</title>
+{% endblock %}
