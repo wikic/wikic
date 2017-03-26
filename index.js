@@ -34,7 +34,7 @@ const defaultConfig = {
 }
 
 class Wikic {
-  constructor() {
+  constructor(cwd) {
     this.writeDocs = this.writeDocs.bind(this)
     this.writeIndex = this.writeIndex.bind(this)
     this.buildStaticFile = this.buildStaticFile.bind(this)
@@ -42,12 +42,7 @@ class Wikic {
     this.renderIndex = this.renderIndex.bind(this)
     this.fillInfo = this.fillInfo.bind(this)
     this.typeMap = this.typeMap.bind(this)
-    this.setup()
-  }
-
-  setCwd(cwd) {
-    this.cwd = path.resolve(cwd)
-    return this
+    this.setup(cwd)
   }
 
   setBaseURL(url = this.config.baseurl) {
@@ -105,12 +100,13 @@ class Wikic {
     return this
   }
 
-  setup(cwd = process.cwd()) {
-    return this.setCwd(cwd)
-      .setConfig()
+  setup(cwd = (this.cwd || process.cwd())) {
+    this.cwd = path.resolve(cwd)
+    this.setConfig()
       .setBaseURL()
       .setPaths()
       .configureRenderer()
+    return this
   }
 
   watch() {
@@ -136,13 +132,10 @@ class Wikic {
   }
 
   serve() {
-    const port = this.config.port
-    const cwd = () => this.publicPath
-    const baseurl = () => this.config.baseurl
     this.server = server({
-      port,
-      cwd,
-      baseurl,
+      port: this.config.port,
+      getCwd: () => this.publicPath,
+      getBaseurl: () => this.config.baseurl,
     })
     return this
   }
@@ -235,6 +228,7 @@ class Wikic {
     await Promise.all([this.buildStaticFiles(), this.buildDocs()])
     if (this.config.overwriteIndex) await this.buildIndex()
     logger.verbose('site rendered!')
+    return this
   }
 
   async buildIndex() {
