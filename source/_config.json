@@ -5,7 +5,7 @@
   "layout": "default",
   "overwriteIndex": true,
   "indexLayout": "index",
-  "baseurl": "",
+  "baseurl": "wikic",
   "port": 4500,
   "layoutPath": "_layouts",
   "publicPath": "../docs",
