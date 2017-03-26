@@ -79,7 +79,7 @@ class Wikic {
   }
 
   getTypeURL(types) {
-    return path.join(this.baseurl, ...types)
+    return path.join(this.baseurl, ...types, '/')
   }
 
   configureRenderer() {
