@@ -5,5 +5,5 @@ const Wikic = require('./../index')
 const wiki = new Wikic()
 
 wiki.render()
-wiki.watch()
-wiki.serve()
+// wiki.watch()
+// wiki.serve()

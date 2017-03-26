@@ -1,8 +1,9 @@
 {% extends "default.njk" %}
 
 {% block body %}
-{{ navbar }}
-{{ content }}
+<p>Layout: index</p>
+{{ navbar | safe }}
+{{ content | safe }}
 {% endblock %}
 
 {% block title %}

@@ -2,17 +2,19 @@
   "root": ".",
   "docsPath": "_note",
   "title": "dgeibi's notebook!",
-  "docsLayout": "docs",
+  "layout": "default",
+  "overwriteIndex": true,
   "indexLayout": "index",
   "baseurl": "",
   "port": 4500,
-  "overwriteIndex": true,
   "layoutPath": "_layouts",
-  "publicPath": "docs",
+  "publicPath": "../docs",
   "excludes": [
     "gulpfile.js",
     "index.js",
-    "go.sh"
+    "yarn.lock",
+    "package.json",
+    "**/node_modules/**"
   ],
   "typeMap": {
     "css": "CSS",

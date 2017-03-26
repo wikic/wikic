@@ -4,15 +4,12 @@ const htmlclean = require('htmlclean')
 const path = require('path')
 const chokidar = require('chokidar')
 
-const load = require('./lib/plugins/load')
-const mdFilter = require('./lib/plugins/mdFilter')
-const fmFilter = require('./lib/plugins/fmFilter')
+const { readMD, writeMD, isMarkdown, renderMD } = require('./lib/plugins/mdKit')
 const renderer = require('./lib/plugins/renderer')
 
 const server = require('./lib/utils/server')
 const logger = require('./lib/utils/log')
 const findDocs = require('./lib/utils/findDocs')
-
 const { glob } = require('./lib/utils/promisified')
 const capitalize = require('./lib/utils/capitalize')
 
@@ -20,13 +17,12 @@ const addTOC = require('./lib/views/addTOC')
 const getList = require('./lib/views/getList')
 const getNav = require('./lib/views/getNav')
 
-const configFileName = '_config.json'
 
 const defaultConfig = {
   root: '.',
   docsPath: '_note',
   title: '',
-  layout: 'docs',
+  layout: 'default',
   overwriteIndex: false,
   indexLayout: 'index',
   baseurl: '',
@@ -88,7 +84,7 @@ class Wikic {
 
   configureRenderer() {
     renderer.configure(this.layoutPath, {
-      autoescape: false,
+      autoescape: true,
       watch: false,
     })
     renderer.env.addGlobal('site', this.config)
@@ -98,7 +94,7 @@ class Wikic {
 
   setup() {
     this.cwd = process.cwd()
-    const rootConfig = fsp.readJsonSync(path.join(this.cwd, configFileName))
+    const rootConfig = fsp.readJsonSync(path.join(this.cwd, '_config.json'))
     Object.assign(this.config, rootConfig)
     this.setBaseURL(this.config.baseurl)
     this.setPaths()
@@ -160,15 +156,16 @@ class Wikic {
   }
 
   fillInfo({ data, config }) {
-    const { _types, title, _address, hide } = config
+    const { types, address, attributes } = config
+    const { title, hide } = attributes
     if (hide) return { data, config }
     if (typeof this.docsInfos !== 'object' && !this.docsInfos) this.docsInfos = {}
     const docInfo = {
-      address: _address,
+      address,
       title,
     }
     /* eslint-disable no-param-reassign */
-    _types.reduce((parent, type, index, arr) => {
+    types.reduce((parent, type, index, arr) => {
       if (typeof parent[type] !== 'object') {
         parent[type] = { _docs: [] }
       }
@@ -182,11 +179,11 @@ class Wikic {
   }
 
   renderIndex({ config }) {
-    const { _types, indexLayout } = config
-    const collections = (_types[0] === '.') ? this.docsInfos : findDocs(this.docsInfos, _types)
-    const content = getList(_types, collections, this)
-    const navbar = getNav(_types, this)
-    const type = _types.map(this.typeMap).join(' - ')
+    const { types, indexLayout } = config
+    const collections = (types[0] === '.') ? this.docsInfos : findDocs(this.docsInfos, types)
+    const content = getList(types, collections, this)
+    const navbar = getNav(types, this)
+    const type = types.map(this.typeMap).join(' - ')
     const newData = renderer.render(`${indexLayout}.njk`, {
       navbar,
       content,
@@ -196,9 +193,11 @@ class Wikic {
   }
 
   renderDocs({ data, config }) {
-    const { layout, title, _types } = config
-    const navbar = getNav(_types, this)
-    const type = _types.map(this.typeMap).join(' - ')
+    const { types, attributes } = config
+    const layout = attributes.layout || config.layout
+    const title = attributes.title
+    const navbar = getNav(types, this)
+    const type = types.map(this.typeMap).join(' - ')
     const page = { title }
     const html = renderer.render(`${layout}.njk`, {
       content: data,
@@ -229,29 +228,29 @@ class Wikic {
     await Promise.all(dirs.map(this.writeIndex))
   }
 
-  writeDocs(file) {
+  async writeDocs(file) {
     const targetRelative = file.replace(/\.md$/, '.html')
 
     const from = path.join(this.docsPath, file)
     const to = path.join(this.publicPath, targetRelative)
 
-    const _types = path.dirname(file).split('/')
-    const _address = path.join('/', targetRelative)
-    const config = Object.assign({}, this.config, { _types, _address })
-    const callback = info => Promise.resolve(info)
-      .then(this.fillInfo)
+    const types = path.dirname(file).split('/')
+    const address = path.join('/', targetRelative)
+    const config = Object.assign({}, this.config, { types, address })
+
+    const result = await readMD(from, config)
+    const html = await Promise.resolve(result).then(this.fillInfo)
       .then(this.renderDocs)
       .then(addTOC)
-
-    return Wikic.writeMD({ from, to, config, callback })
+    await writeMD(to, html)
   }
 
   writeIndex(dir) {
     const dirname = dir.slice(0, dir.length - 1)
-    const _types = dirname.split('/')
+    const types = dirname.split('/')
     const target = path.join(this.publicPath, dirname, 'index.html')
-    const _address = path.join('/', dirname, '/')
-    const config = Object.assign({}, this.config, { _types, _address })
+    const address = path.join('/', dirname, '/')
+    const config = Object.assign({}, this.config, { types, address })
     return Promise.resolve({ config })
       .then(this.renderIndex)
       .then(htmlclean)
@@ -262,10 +261,12 @@ class Wikic {
   async buildStaticFile(filePath) {
     const from = path.join(this.root, filePath)
     let to = path.join(this.publicPath, filePath)
-    if (Wikic.isMarkdown(from)) {
+    if (isMarkdown(from)) {
       const config = Object.assign({}, this.config)
       to = to.replace(/\.md$/, '.html')
-      await Wikic.writeMD({ from, to, config })
+      const result = await readMD(from, config)
+      const html = renderMD(result, renderer)
+      await writeMD(to, html)
     } else {
       await fsp.copy(from, to)
     }
@@ -293,32 +294,3 @@ class Wikic {
 }
 
 module.exports = Wikic
-
-Wikic.isMarkdown = function isMarkdown(file) {
-  return /\.md$/.test(file)
-}
-
-Wikic.renderMD = function renderMD({ data, config }) {
-  const { layout, title } = config
-  const page = { title }
-  const html = renderer.render(`${layout}.njk`, {
-    content: data,
-    page,
-  })
-  return html
-}
-
-/**
- * from: fullPath, to: fullPath, callback: ({data, config}) => data
- */
-Wikic.writeMD = async function writeMD({ from, to, config, callback = Wikic.renderMD }) {
-  const info = await load({
-    configFileName,
-    fileFullPath: from,
-    defaultConfig: config,
-  })
-    .then(fmFilter)
-    .then(mdFilter)
-  const html = htmlclean(await callback(info))
-  await fsp.outputFile(to, html)
-}

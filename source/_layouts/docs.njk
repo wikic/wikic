@@ -9,9 +9,10 @@
 {% endblock %}
 
 {% block body %}
-{{ navbar }}
+<p>Layout: docs</p>
+{{ navbar | safe }}
 <div id="toc"></div>
 <div class="page-content">
-{{ content }}
+{{ content | safe }}
 </div>
 {% endblock %}
