@@ -35,8 +35,6 @@ const defaultConfig = {
 
 class Wikic {
   constructor() {
-    this.config = Object.assign({}, defaultConfig)
-    this.setup()
     this.writeDocs = this.writeDocs.bind(this)
     this.writeIndex = this.writeIndex.bind(this)
     this.buildStaticFile = this.buildStaticFile.bind(this)
@@ -44,10 +42,17 @@ class Wikic {
     this.renderIndex = this.renderIndex.bind(this)
     this.fillInfo = this.fillInfo.bind(this)
     this.typeMap = this.typeMap.bind(this)
+    this.setup()
   }
 
-  setBaseURL(url) {
+  setCwd(cwd) {
+    this.cwd = path.resolve(cwd)
+    return this
+  }
+
+  setBaseURL(url = this.config.baseurl) {
     this.baseurl = `/${url}`
+    return this
   }
 
   typeMap(key) {
@@ -90,20 +95,27 @@ class Wikic {
     renderer.env.addGlobal('site', this.config)
     renderer.env.addFilter('typeMap', (...arg) => this.typeMap(...arg))
     renderer.env.addFilter('absolute', (...arg) => this.getURL(...arg))
+    return this
   }
 
-  setup() {
-    this.cwd = process.cwd()
+  setConfig() {
+    this.config = Object.assign({}, defaultConfig)
     const rootConfig = fsp.readJsonSync(path.join(this.cwd, '_config.json'))
     Object.assign(this.config, rootConfig)
-    this.setBaseURL(this.config.baseurl)
-    this.setPaths()
-    this.configureRenderer()
+    return this
+  }
+
+  setup(cwd = process.cwd()) {
+    return this.setCwd(cwd)
+      .setConfig()
+      .setBaseURL()
+      .setPaths()
+      .configureRenderer()
   }
 
   watch() {
     const watcher = chokidar.watch('**/*', {
-      cwd: '.',
+      cwd: this.root,
       ignored: [
         /(^|[/\\])\../,
         `${this.config.publicPath}/**`,
@@ -120,6 +132,7 @@ class Wikic {
         fsp.removeSync(path.join(this.publicPath, filePath))
       })
       .on('error', error => logger.error(`Watcher Error: ${error}`))
+    return this
   }
 
   serve() {
@@ -131,6 +144,7 @@ class Wikic {
       cwd,
       baseurl,
     })
+    return this
   }
 
   stopServer() {
@@ -139,20 +153,21 @@ class Wikic {
         .on('close', () => logger.info('Server stopped'))
         .on('error', e => logger.error(e))
     }
+    return this
   }
 
   handleFileChange(filePath) {
     logger.verbose(`File ${filePath} has been changed`)
-    this.setup()
-    this.render()
+    this.setup().render()
   }
 
   setPaths() {
     const { root, publicPath, docsPath, layoutPath } = this.config
-    this.publicPath = path.resolve(root, publicPath)
-    this.layoutPath = path.resolve(root, layoutPath)
-    this.docsPath = path.resolve(root, docsPath)
-    this.root = path.resolve(root)
+    this.root = path.resolve(this.cwd, root)
+    this.publicPath = path.resolve(this.root, publicPath)
+    this.layoutPath = path.resolve(this.root, layoutPath)
+    this.docsPath = path.resolve(this.root, docsPath)
+    return this
   }
 
   fillInfo({ data, config }) {
@@ -239,7 +254,8 @@ class Wikic {
     const config = Object.assign({}, this.config, { types, address })
 
     const result = await readMD(from, config)
-    const html = await Promise.resolve(result).then(this.fillInfo)
+    const html = await Promise.resolve(result)
+      .then(this.fillInfo)
       .then(this.renderDocs)
       .then(addTOC)
     await writeMD(to, html)
@@ -274,15 +290,15 @@ class Wikic {
 
   async buildStaticFiles() {
     const { excludes, publicPath } = this.config
-    const ignore = [
-      `${publicPath}/**`,
-      '_*/**',
-      ...excludes,
-    ]
     const files = await glob('**/*', {
-      ignore,
-      nodir: true,
       cwd: this.root,
+      nodir: true,
+      ignore: [
+        `${publicPath}/**`,
+        '_*/**',
+        '**/node_modules/**',
+        ...excludes,
+      ],
     })
     await Promise.all(files.map(this.buildStaticFile))
   }
@@ -290,6 +306,7 @@ class Wikic {
   clean() {
     fsp.emptyDirSync(this.publicPath)
     logger.verbose('site cleaned!')
+    return this
   }
 }
 

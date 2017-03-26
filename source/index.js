@@ -2,8 +2,6 @@
 
 const Wikic = require('./../index')
 
-const wiki = new Wikic()
+const wikic = new Wikic()
 
-wiki.render()
-// wiki.watch()
-// wiki.serve()
+wikic.render()
