@@ -3,11 +3,13 @@ const fsp = require('fs-promise')
 const path = require('path')
 const chokidar = require('chokidar')
 
-const Kit = require('./lib/plugins/Kit')
-const renderer = require('./lib/plugins/renderer')
+const load = require('./lib/plugins/load')
 const { makeIndex, makeDoc } = require('./lib/plugins/maker')
 const fillInfo = require('./lib/plugins/fillInfo')
+const mdFilter = require('./lib/plugins/mdFilter')
+const fmFilter = require('./lib/plugins/fmFilter')
 
+const renderer = require('./lib/utils/renderer')
 const server = require('./lib/utils/server')
 const logger = require('./lib/utils/log')
 
@@ -16,16 +18,55 @@ const capitalize = require('./lib/utils/capitalize')
 
 const defaultConfig = require('./lib/defaultConfig.json')
 
-const { isMarkdown, renderMD } = Kit
-
 class Wikic {
   constructor(cwd) {
     this.renderer = renderer
+    this.afterReadingCallbacks = [fmFilter, mdFilter]
+    this.beforeWritingCallbacks = []
     this.fillInfo = fillInfo.bind(this)
     this.buildStaticFile = this.buildStaticFile.bind(this)
     this.typeMap = this.typeMap.bind(this)
-    this.kit = new Kit()
+    this.writeMD = this.writeMD.bind(this)
+    this.readMD = this.readMD.bind(this)
     this.setup(cwd)
+  }
+
+  afterReading(func) {
+    if (typeof func === 'function') this.afterReadingCallbacks.push(func)
+  }
+
+  beforeWriting(func) {
+    if (typeof func === 'function') this.beforeWritingCallbacks.push(func)
+  }
+
+  static isMarkdown(filePath) {
+    return path.extname(filePath) === '.md'
+  }
+
+  static renderMD(context) {
+    const { data, config } = context
+    const layout = config.attributes.layout || config.layout
+    const title = config.attributes.title
+    const page = { title }
+    const html = renderer.render(`${layout}.njk`, {
+      content: data,
+      page,
+    })
+    return Object.assign(context, { data: html })
+  }
+
+  writeMD(context) {
+    return this.beforeWritingCallbacks
+            .reduce((promise, callback) => promise.then(callback), Promise.resolve(context))
+            .then(({ to, data }) => fsp.outputFile(to, data))
+            .catch(logger.error)
+  }
+
+  readMD(context) {
+    const promiseRead = load(context).catch(logger.error)
+    return this.afterReadingCallbacks
+            .reduce((promise, callback) => promise.then(callback), promiseRead)
+            .catch(logger.error)
   }
 
   setBaseURL(url = this.config.baseurl) {
@@ -94,7 +135,7 @@ class Wikic {
   setup(cwd = (this.cwd || process.cwd())) {
     this.cwd = path.resolve(cwd)
     this.setConfig()
-      .setBaseURL()
+            .setBaseURL()
     return this
   }
 
@@ -111,12 +152,12 @@ class Wikic {
     })
 
     watcher
-      .on('change', this.handleFileChange.bind(this))
-      .on('unlink', (filePath) => {
-        logger.verbose(`File ${filePath} has been removed`)
-        fsp.removeSync(path.join(this.publicPath, filePath))
-      })
-      .on('error', error => logger.error(`Watcher Error: ${error}`))
+            .on('change', this.handleFileChange.bind(this))
+            .on('unlink', (filePath) => {
+              logger.verbose(`File ${filePath} has been removed`)
+              fsp.removeSync(path.join(this.publicPath, filePath))
+            })
+            .on('error', error => logger.error(`Watcher Error: ${error}`))
     return this
   }
 
@@ -132,8 +173,8 @@ class Wikic {
   stopServer() {
     if (this.server) {
       this.server.close()
-        .on('close', () => logger.info('Server stopped'))
-        .on('error', e => logger.error(e))
+                .on('close', () => logger.info('Server stopped'))
+                .on('error', e => logger.error(e))
     }
     return this
   }
@@ -148,7 +189,7 @@ class Wikic {
     const generate = makeDoc.bind(this)
 
     return glob('**/*.md', { cwd: this.docsPath })
-      .then(files => Promise.all(files.map(generate)))
+            .then(files => Promise.all(files.map(generate)))
   }
 
   async render() {
@@ -169,12 +210,12 @@ class Wikic {
   async buildStaticFile(filePath) {
     const from = path.join(this.root, filePath)
     let to = path.join(this.publicPath, filePath)
-    if (isMarkdown(from)) {
+    if (Wikic.isMarkdown(from)) {
       const config = Object.assign({}, this.config)
       to = to.replace(/\.md$/, '.html')
-      const result = await this.kit.readMD(from, config)
-      const html = renderMD(result)
-      await this.kit.writeMD(to, html)
+      await this.readMD({ from, to, config })
+                .then(Wikic.renderMD)
+                .then(this.writeMD)
     } else {
       await fsp.copy(from, to)
     }
