@@ -1,11 +1,11 @@
 {% extends "default.njk" %}
 
-{% block body %}
+{%- block body -%}
 <p>Layout: index</p>
-{{ navbar | safe }}
-{{ content | safe }}
-{% endblock %}
+{{- navbar | safe -}}
+{{- content | safe -}}
+{%- endblock %}
 
-{% block title %}
+{%- block title %}
   <title>{{ type }} | {{ site.title }}</title>
-{% endblock %}
+{%- endblock -%}

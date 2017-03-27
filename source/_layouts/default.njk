@@ -1,19 +1,19 @@
 <!doctype html>
 <html>
   <head>
-  {% block title %}
+  {%- block title %}
     <title>{{ page.title }}{{ " | " if page.title }}{{ site.title }}</title>
-  {% endblock %}
-  {% block extraStyle %}
-  {% endblock %}
+  {%- endblock %}
+  {%- block extraStyle %}
+  {%- endblock %}
   </head>
   <body>
-    {% include "includes/header.njk" %}
+    {%- include "includes/header.njk" -%}
     <p>Layout: default</p>
-    {% block body %}
-    {{ content | safe }}
-    {% endblock %}
+    {%- block body %}
+    {{- content | safe }}
+    {%- endblock %}
 
-    {% include "includes/footer.njk" %}
+    {%- include "includes/footer.njk" -%}
   </body>
 </html>

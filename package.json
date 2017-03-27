@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "private": true,
   "description": "a static wiki generator",
   "main": "index.js",
@@ -21,8 +21,6 @@
     "glob": "^7.1.1",
     "highlight.js": "^9.10.0",
     "html-toc": "dgeibi/html-toc",
-    "htmlclean": "^2.7.10",
-    "js-yaml": "^3.8.2",
     "markdown-it": "^8.3.1",
     "nunjucks": "^3.0.0",
     "winston": "^2.3.1"

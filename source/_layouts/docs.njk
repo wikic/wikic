@@ -1,18 +1,18 @@
 {% extends "default.njk" %}
 
-{% block extraStyle %}
+{%- block extraStyle %}
 <link rel="stylesheet" href="{{ '/assets/css/github.css' | absolute }}">
-{% endblock %}
+{%- endblock %}
 
-{% block title %}
+{%- block title %}
 <title>{{ page.title }} - {{ type }} | {{ site.title }}</title>
-{% endblock %}
+{%- endblock %}
 
-{% block body %}
+{%- block body %}
 <p>Layout: docs</p>
-{{ navbar | safe }}
+{{- navbar | safe -}}
 <div id="toc"></div>
 <div class="page-content">
-{{ content | safe }}
+{{- content | safe -}}
 </div>
-{% endblock %}
+{%- endblock %}

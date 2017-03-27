@@ -3,9 +3,9 @@ const fsp = require('fs-promise')
 const path = require('path')
 const chokidar = require('chokidar')
 
-const { readMD, writeMD, isMarkdown, renderMD } = require('./lib/plugins/mdKit')
+const Kit = require('./lib/plugins/Kit')
 const renderer = require('./lib/plugins/renderer')
-const { writeIndex, writeDocs } = require('./lib/plugins/writer')
+const { makeIndex, makeDoc } = require('./lib/plugins/maker')
 const fillInfo = require('./lib/plugins/fillInfo')
 
 const server = require('./lib/utils/server')
@@ -16,12 +16,15 @@ const capitalize = require('./lib/utils/capitalize')
 
 const defaultConfig = require('./lib/defaultConfig.json')
 
+const { isMarkdown, renderMD } = Kit
+
 class Wikic {
   constructor(cwd) {
     this.renderer = renderer
     this.fillInfo = fillInfo.bind(this)
     this.buildStaticFile = this.buildStaticFile.bind(this)
     this.typeMap = this.typeMap.bind(this)
+    this.kit = new Kit()
     this.setup(cwd)
   }
 
@@ -142,10 +145,10 @@ class Wikic {
 
   buildDocs() {
     this.docsInfos = {}
-    const write = writeDocs.bind(this)
+    const generate = makeDoc.bind(this)
 
     return glob('**/*.md', { cwd: this.docsPath })
-      .then(files => Promise.all(files.map(write)))
+      .then(files => Promise.all(files.map(generate)))
   }
 
   async render() {
@@ -157,10 +160,10 @@ class Wikic {
   }
 
   async buildIndex() {
-    const write = writeIndex.bind(this)
+    const generate = makeIndex.bind(this)
     const dirs = await glob('**/', { cwd: this.docsPath })
     dirs.push('./')
-    await Promise.all(dirs.map(write))
+    await Promise.all(dirs.map(generate))
   }
 
   async buildStaticFile(filePath) {
@@ -169,9 +172,9 @@ class Wikic {
     if (isMarkdown(from)) {
       const config = Object.assign({}, this.config)
       to = to.replace(/\.md$/, '.html')
-      const result = await readMD(from, config)
-      const html = renderMD(result, renderer)
-      await writeMD(to, html)
+      const result = await this.kit.readMD(from, config)
+      const html = renderMD(result)
+      await this.kit.writeMD(to, html)
     } else {
       await fsp.copy(from, to)
     }
