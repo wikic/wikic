@@ -1,6 +1,6 @@
 const Wikic = require('./index')
 
-const wikic = new Wikic('./source')
+const wikic = new Wikic('./example')
 
 wikic.render()
   .then(w => w.watch())

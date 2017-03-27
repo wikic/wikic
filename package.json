@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node start.js",
-    "build": "cd source && node index.js",
+    "build": "cd example && node index.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
