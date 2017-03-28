@@ -4,11 +4,15 @@ const path = require('path')
 const chokidar = require('chokidar')
 
 const load = require('./lib/plugins/load')
-const { makeIndex, makeDoc } = require('./lib/plugins/maker')
 const fillInfo = require('./lib/plugins/fillInfo')
 const mdFilter = require('./lib/plugins/mdFilter')
 const fmFilter = require('./lib/plugins/fmFilter')
+const addTOC = require('./lib/plugins/addTOC')
 
+const getNav = require('./lib/views/getNav')
+const getList = require('./lib/views/getList')
+
+const findDocs = require('./lib/utils/findDocs')
 const renderer = require('./lib/utils/renderer')
 const server = require('./lib/utils/server')
 const logger = require('./lib/utils/log')
@@ -21,8 +25,8 @@ const defaultConfig = require('./lib/defaultConfig.json')
 class Wikic {
   constructor(cwd) {
     this.renderer = renderer
-    this.afterReadingCallbacks = [fmFilter, mdFilter]
-    this.beforeWritingCallbacks = []
+    this.afterReadTasks = [fmFilter, mdFilter] // after read before render
+    this.beforeWriteTasks = [] // after render before write
     this.fillInfo = fillInfo.bind(this)
     this.buildStaticFile = this.buildStaticFile.bind(this)
     this.typeMap = this.typeMap.bind(this)
@@ -32,11 +36,11 @@ class Wikic {
   }
 
   afterReading(func) {
-    if (typeof func === 'function') this.afterReadingCallbacks.push(func)
+    if (typeof func === 'function') this.afterReadTasks.push(func)
   }
 
   beforeWriting(func) {
-    if (typeof func === 'function') this.beforeWritingCallbacks.push(func)
+    if (typeof func === 'function') this.beforeWriteTasks.push(func)
   }
 
   static isMarkdown(filePath) {
@@ -45,28 +49,56 @@ class Wikic {
 
   static renderMD(context) {
     const { data, config } = context
-    const layout = config.attributes.layout || config.layout
-    const title = config.attributes.title
+    let layout
+    let title
+    if (typeof config.attributes === 'undefined') {
+      layout = config.layout
+    } else {
+      layout = config.attributes.layout || config.layout
+      title = config.attributes.title
+    }
     const page = { title }
-    const html = renderer.render(`${layout}.njk`, {
+    const renderContext = Object.assign({
       content: data,
       page,
-    })
+    }, context.renderContext)
+    const html = renderer.render(`${layout}.njk`, renderContext)
     return Object.assign(context, { data: html })
   }
 
+  buildMD(context) {
+    return this.readMD(context)
+      .then(Wikic.renderMD)
+      .then(this.writeMD)
+  }
+
   writeMD(context) {
-    return this.beforeWritingCallbacks
-            .reduce((promise, callback) => promise.then(callback), Promise.resolve(context))
-            .then(({ to, data }) => fsp.outputFile(to, data))
-            .catch(logger.error)
+    let callbacks
+    if (Array.isArray(context.beforeWriteTasks)) {
+      callbacks = this.beforeWriteTasks.concat(context.beforeWriteTasks)
+    } else {
+      callbacks = this.beforeWriteTasks
+    }
+    return callbacks
+      .reduce((promise, callback) => promise.then(callback.bind(this)), Promise.resolve(context))
+      .then(({ to, data }) => fsp.outputFile(to.replace(/\.md$/, '.html'), data))
+      .catch(logger.error)
   }
 
   readMD(context) {
-    const promiseRead = load(context).catch(logger.error)
-    return this.afterReadingCallbacks
-            .reduce((promise, callback) => promise.then(callback), promiseRead)
-            .catch(logger.error)
+    let callbacks
+    const promiseRead = typeof context.from === 'string' ?
+      load(context).catch(logger.error) : Promise.resolve(context)
+    if (Array.isArray(context.afterReadTasks)) {
+      callbacks = context.skipRead ?
+        context.afterReadTasks :
+        this.afterReadTasks.concat(context.afterReadTasks)
+    } else {
+      callbacks = this.afterReadTasks
+    }
+    return callbacks
+      .reduce((promise, callback) => promise.then(callback.bind(this)), promiseRead)
+      .catch(logger.error)
   }
 
   setBaseURL(url = this.config.baseurl) {
@@ -135,7 +167,7 @@ class Wikic {
   setup(cwd = (this.cwd || process.cwd())) {
     this.cwd = path.resolve(cwd)
     this.setConfig()
-            .setBaseURL()
+      .setBaseURL()
     return this
   }
 
@@ -152,12 +184,12 @@ class Wikic {
     })
 
     watcher
-            .on('change', this.handleFileChange.bind(this))
-            .on('unlink', (filePath) => {
-              logger.verbose(`File ${filePath} has been removed`)
-              fsp.removeSync(path.join(this.publicPath, filePath))
-            })
-            .on('error', error => logger.error(`Watcher Error: ${error}`))
+      .on('change', this.handleFileChange.bind(this))
+      .on('unlink', (filePath) => {
+        logger.verbose(`File ${filePath} has been removed`)
+        fsp.removeSync(path.join(this.publicPath, filePath))
+      })
+      .on('error', error => logger.error(`Watcher Error: ${error}`))
     return this
   }
 
@@ -173,8 +205,8 @@ class Wikic {
   stopServer() {
     if (this.server) {
       this.server.close()
-                .on('close', () => logger.info('Server stopped'))
-                .on('error', e => logger.error(e))
+        .on('close', () => logger.info('Server stopped'))
+        .on('error', e => logger.error(e))
     }
     return this
   }
@@ -185,11 +217,39 @@ class Wikic {
   }
 
   buildDocs() {
-    this.docsInfos = {}
-    const generate = makeDoc.bind(this)
+    this.docsInfos = {} // reset docsInfos
+    const beforeRenderDoc = (context) => {
+      const { config } = context
+
+      const navbar = getNav(config.types, this)
+      const type = config.types.map(this.typeMap).join(' - ')
+      const renderContext = Object.assign({}, context.renderContext, { navbar, type })
+
+      return Object.assign(context, { renderContext })
+    }
 
     return glob('**/*.md', { cwd: this.docsPath })
-            .then(files => Promise.all(files.map(generate)))
+      .then(files => Promise.all(files.map(
+        (filePath) => {
+          const targetRelative = filePath.replace(/\.md$/, '.html')
+
+          const from = path.join(this.docsPath, filePath)
+          const to = path.join(this.publicPath, targetRelative)
+
+          const types = path.dirname(filePath).split('/')
+          const address = path.join('/', targetRelative)
+          const config = Object.assign({}, this.config, { types, address })
+
+          return this.buildMD({
+            from,
+            to,
+            config,
+            afterReadTasks: [this.fillInfo, beforeRenderDoc],
+            beforeWriteTasks: [addTOC],
+          }).catch(logger.error)
+        }
+      )))
+      .catch(logger.error)
   }
 
   async render() {
@@ -201,21 +261,53 @@ class Wikic {
   }
 
   async buildIndex() {
-    const generate = makeIndex.bind(this)
     const dirs = await glob('**/', { cwd: this.docsPath })
     dirs.push('./')
-    await Promise.all(dirs.map(generate))
+
+    const beforeRenderIndex = (context) => {
+      if (typeof context.config.indexLayout !== 'string') {
+        throw Error('should set `indexLayout` in _config.json')
+      }
+      // overwrite config.layout -> index
+      const config = Object.assign({}, context.config, { layout: context.config.indexLayout })
+
+      const types = config.types
+      const type = types.map(this.typeMap).join(' - ')
+
+
+      // get content of index
+      const collections = (types[0] === '.') ? this.docsInfos : findDocs(this.docsInfos, types)
+      const data = getList(types, collections, this)
+      const navbar = getNav(types, this)
+
+      const renderContext = Object.assign({}, context.renderContext, { navbar, type })
+
+      return Object.assign(context, { data, renderContext, config })
+    }
+
+    await Promise.all(dirs.map(
+      (dir) => {
+        const dirname = dir.slice(0, dir.length - 1) // ignore `/`
+        const types = dirname.split('/')
+        const to = path.join(this.publicPath, dirname, 'index.html')
+        const address = path.join('/', dirname, '/')
+        const config = Object.assign({}, this.config, { types, address })
+        return this.buildMD({
+          config,
+          to,
+          afterReadTasks: [beforeRenderIndex],
+          skipRead: true,
+        }).catch(logger.error)
+      }
+    ))
   }
 
   async buildStaticFile(filePath) {
     const from = path.join(this.root, filePath)
-    let to = path.join(this.publicPath, filePath)
+    const to = path.join(this.publicPath, filePath)
     if (Wikic.isMarkdown(from)) {
       const config = Object.assign({}, this.config)
-      to = to.replace(/\.md$/, '.html')
-      await this.readMD({ from, to, config })
-                .then(Wikic.renderMD)
-                .then(this.writeMD)
+      await this.buildMD({ from, to, config })
     } else {
       await fsp.copy(from, to)
     }
