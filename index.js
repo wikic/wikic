@@ -18,7 +18,7 @@ const getConfig = require('./lib/utils/getConfig')
 const findDocs = require('./lib/utils/findDocs')
 const renderer = require('./lib/utils/renderer')
 const simpleServer = require('./lib/utils/server')
-const { glob } = require('./lib/utils/promisified')
+const glob = require('./lib/utils/glob')
 const capitalize = require('./lib/utils/capitalize')
 
 class Wikic {

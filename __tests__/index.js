@@ -1,7 +1,8 @@
 const Wikic = require('../index')
 
 jest.mock('fs-promise')
-jest.mock('../lib/utils/promisified')
+jest.mock('../lib/utils/glob')
+// jest.mock('../lib/utils/findParentDir')
 jest.mock('../lib/utils/server', () => () => true)
 jest.mock('../lib/plugins/addTOC', () => context => context)
 jest.mock('../lib/plugins/load', () => context => Promise.resolve(context))
@@ -52,12 +53,12 @@ jest.mock('../lib/utils/renderer', () => ({
     },
   },
 }))
-const promisified = require('../lib/utils/promisified')
+const glob = require('../lib/utils/glob')
 
 /* eslint-disable no-underscore-dangle */
-promisified.__setGlob__('**/*', ['404.md', 'styles/main.css'])
-promisified.__setGlob__('**/*.md', ['css/flexbox.md', 'html/hi.md'])
-promisified.__setGlob__('**/', ['css/', 'html/'])
+glob.__setPath('**/*', ['404.md', 'styles/main.css'])
+glob.__setPath('**/*.md', ['css/flexbox.md', 'html/hi.md'])
+glob.__setPath('**/', ['css/', 'html/'])
 /* eslint-enable no-underscore-dangle */
 
 jest.mock('chokidar', () => {
