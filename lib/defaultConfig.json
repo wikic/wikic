@@ -4,7 +4,7 @@
   "title": "",
   "layout": "default",
   "overwriteIndex": false,
-  "indexLayout": "index",
+  "indexLayout": "",
   "baseurl": "",
   "port": 4000,
   "layoutPath": "_layouts",

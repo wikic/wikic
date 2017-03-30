@@ -4,4 +4,4 @@ const Wikic = require('./../index')
 
 const wikic = new Wikic()
 
-wikic.render()
+wikic.build()
