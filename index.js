@@ -13,6 +13,7 @@ const addTOC = require('./lib/plugins/addTOC')
 const getNav = require('./lib/views/getNav')
 const getList = require('./lib/views/getList')
 
+const { isString, isFunction } = require('./lib/utils/typeof')
 const logger = require('./lib/utils/log')
 const getConfig = require('./lib/utils/getConfig')
 const findDocs = require('./lib/utils/findDocs')
@@ -74,7 +75,7 @@ class Wikic {
   }
 
   afterRead(func) {
-    if (typeof func === 'function') {
+    if (isFunction(func)) {
       this.afterReadTasks.push(func)
     } else {
       throw Error('should pass a function')
@@ -83,7 +84,7 @@ class Wikic {
   }
 
   beforeWrite(func) {
-    if (typeof func === 'function') {
+    if (isFunction(func)) {
       this.beforeWriteTasks.push(func)
     } else {
       throw Error('should pass a function')
@@ -99,7 +100,7 @@ class Wikic {
     const { data, config } = context
     let layout
     let title
-    if (typeof config.attributes === 'undefined') {
+    if (!config.attributes) {
       layout = config.layout
     } else {
       layout = config.attributes.layout || config.layout
@@ -118,33 +119,52 @@ class Wikic {
     return this.readMD(context)
       .then(Wikic.renderMD)
       .then((...arg) => this.writeMD(...arg))
+      .catch(logger.error)
   }
 
-  writeMD(context) {
+  async writeMD(context) {
     let callbacks
     if (Array.isArray(context.beforeWriteTasks)) {
       callbacks = this.beforeWriteTasks.concat(context.beforeWriteTasks)
     } else {
       callbacks = this.beforeWriteTasks
     }
-    return callbacks
-      .reduce((promise, callback) => promise.then(callback.bind(this)), Promise.resolve(context))
-      .then(({ to, data }) => fsp.outputFile(to.replace(/\.md$/, '.html'), data))
+
+    let newContext = context
+    /* eslint-disable no-await-in-loop, no-restricted-syntax */
+    for (const callback of callbacks) {
+      newContext = await callback.call(this, newContext)
+    }
+    /* eslint-enable no-await-in-loop, no-restricted-syntax */
+    const { to, data } = newContext
+    if (isString(to) && isString(data)) {
+      await fsp.outputFile(newContext.to, newContext.data)
+    }
+    return newContext
   }
 
-  readMD(context) {
-    let callbacks
-    const promiseRead = typeof context.from === 'string' ?
+  async readMD(context) {
+    const promiseRead = isString(context.from) ?
       load(context) : Promise.resolve(context)
+
+    let callbacks
     if (Array.isArray(context.afterReadTasks)) {
-      callbacks = context.skipRead ?
-        context.afterReadTasks :
-        this.afterReadTasks.concat(context.afterReadTasks)
+      if (context.skipRead) {
+        callbacks = context.afterReadTasks
+      } else {
+        callbacks = this.afterReadTasks.concat(context.afterReadTasks)
+      }
     } else {
       callbacks = this.afterReadTasks
     }
-    return callbacks
-      .reduce((promise, callback) => promise.then(callback.bind(this)), promiseRead)
+
+    let newContext = await promiseRead
+    /* eslint-disable no-await-in-loop, no-restricted-syntax */
+    for (const callback of callbacks) {
+      newContext = await callback.call(this, newContext)
+    }
+    /* eslint-enable no-await-in-loop, no-restricted-syntax */
+    return newContext
   }
 
   watch() {
@@ -160,7 +180,7 @@ class Wikic {
     })
       .on('change', (filePath) => {
         logger.verbose(`File ${filePath} has been changed`)
-        this.setup().render()
+        this.setup().build()
       })
       .on('unlink', (filePath) => {
         logger.verbose(`File ${filePath} has been removed`)
@@ -179,7 +199,7 @@ class Wikic {
     return this
   }
 
-  buildDocs() {
+  async buildDocs() {
     this.docsInfos = {} // reset docsInfos
     const beforeRenderDoc = (context) => {
       const { config } = context
@@ -191,27 +211,27 @@ class Wikic {
       return Object.assign(context, { renderContext })
     }
 
-    return glob('**/*.md', { cwd: this.docsPath })
-      .then(files => Promise.all(files.map(
-        (filePath) => {
-          const targetRelative = filePath.replace(/\.md$/, '.html')
+    const files = await glob('**/*.md', { cwd: this.docsPath })
+    await Promise.all(files.map(
+      async (filePath) => {
+        const targetRelative = filePath.replace(/\.md$/, '.html')
 
-          const from = path.join(this.docsPath, filePath)
-          const to = path.join(this.publicPath, targetRelative)
+        const from = path.join(this.docsPath, filePath)
+        const to = path.join(this.publicPath, targetRelative)
 
-          const types = path.dirname(filePath).split('/')
-          const address = path.join('/', targetRelative)
-          const config = Object.assign({}, this.config, { types, address })
+        const types = path.dirname(filePath).split('/')
+        const address = path.join('/', targetRelative)
+        const config = Object.assign({}, this.config, { types, address })
 
-          return this.buildMD({
-            from,
-            to,
-            config,
-            afterReadTasks: [fillInfo, beforeRenderDoc],
-            beforeWriteTasks: [addTOC],
-          })
-        }
-      )))
+        await this.buildMD({
+          from,
+          to,
+          config,
+          afterReadTasks: [fillInfo, beforeRenderDoc],
+          beforeWriteTasks: [addTOC],
+        })
+      }
+    ))
   }
 
   async buildIndex() {
@@ -222,7 +242,7 @@ class Wikic {
     dirs.push('./')
 
     const beforeRenderIndex = (context) => {
-      if (typeof context.config.indexLayout !== 'string' || context.config.indexLayout === '') {
+      if (!isString(context.config.indexLayout) || context.config.indexLayout === '') {
         throw Error('should set `indexLayout` in _config.json')
       }
       // overwrite config.layout -> index
@@ -243,13 +263,13 @@ class Wikic {
     }
 
     await Promise.all(dirs.map(
-      (dir) => {
+      async (dir) => {
         const dirname = dir.slice(0, dir.length - 1) // ignore `/`
         const types = dirname.split('/')
         const to = path.join(this.publicPath, dirname, 'index.html')
         const address = path.join('/', dirname, '/')
         const config = Object.assign({}, this.config, { types, address })
-        return this.buildMD({
+        await this.buildMD({
           config,
           to,
           afterReadTasks: [beforeRenderIndex],
@@ -294,7 +314,7 @@ class Wikic {
 
   typeMap(key) {
     const map = this.config.typeMap
-    if (typeof map[key] === 'string') {
+    if (isString(map[key])) {
       return map[key]
     }
     return capitalize(key)

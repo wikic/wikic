@@ -872,7 +872,7 @@ eslint-config-airbnb-base@^11.1.1:
   version "11.1.1"
   resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-11.1.1.tgz#61e9e89e4eb89f474f6913ac817be9fbb59063e0"
 
-eslint-config-dgeibi@dgeibi/eslint-config-dgeibi:
+"eslint-config-dgeibi@github:dgeibi/eslint-config-dgeibi":
   version "1.0.0"
   resolved "https://codeload.github.com/dgeibi/eslint-config-dgeibi/tar.gz/2f2328ed246e1278118f00abb53129e7dc6ff9d1"
 
@@ -1370,9 +1370,9 @@ html-encoding-sniffer@^1.0.1:
   dependencies:
     whatwg-encoding "^1.0.1"
 
-html-toc@dgeibi/html-toc:
+html-toc@^1.0.0:
   version "1.0.0"
-  resolved "https://codeload.github.com/dgeibi/html-toc/tar.gz/24367c849f5de6975d5b4d1c399fb50b32dad5a4"
+  resolved "https://registry.yarnpkg.com/html-toc/-/html-toc-1.0.0.tgz#9b85d71a359f8cbf478614e92ec1ad6f6ea85d46"
   dependencies:
     cheerio "^0.22.0"
     extend-shallow "^2.0.1"

@@ -1,11 +1,10 @@
-const Wikic = require('../index')
-
 jest.mock('fs-promise')
 jest.mock('../lib/utils/glob')
-// jest.mock('../lib/utils/findParentDir')
 jest.mock('../lib/utils/server', () => () => true)
 jest.mock('../lib/plugins/addTOC', () => context => context)
 jest.mock('../lib/plugins/load', () => context => Promise.resolve(context))
+jest.mock('../lib/utils/log', () => jest.genMockFromModule('../lib/utils/log'))
+
 jest.mock('../lib/utils/getConfig', () => () => ({
   root: '.',
   docsPath: '_note',
@@ -34,25 +33,27 @@ jest.mock('../lib/utils/getConfig', () => () => ({
   },
 }))
 
-jest.mock('../lib/utils/renderer', () => ({
-  configure() {
-    return undefined
-  },
+jest.mock('chokidar', () => {
+  const chokidar = jest.genMockFromModule('chokidar')
+  const watch = jest.fn(() => ({
+    on: jest.fn(() => watch()),
+  }))
+  chokidar.watch = watch
+  return chokidar
+})
 
-  render() {
-    return undefined
-  },
+jest.mock('../lib/utils/renderer', () => {
+  const renderer = {}
+  renderer.configure = jest.fn()
+  renderer.render = jest.fn((layout, context) => context.content)
+  renderer.env = {}
+  renderer.env.addGlobal = jest.fn()
+  renderer.env.addFilter = jest.fn()
+  return renderer
+})
 
-  env: {
-    addGlobal() {
-      return undefined
-    },
-
-    addFilter() {
-      return undefined
-    },
-  },
-}))
+const Wikic = require('../index')
+const logger = require('../lib/utils/log')
 const glob = require('../lib/utils/glob')
 
 /* eslint-disable no-underscore-dangle */
@@ -61,14 +62,7 @@ glob.__setPath('**/*.md', ['css/flexbox.md', 'html/hi.md'])
 glob.__setPath('**/', ['css/', 'html/'])
 /* eslint-enable no-underscore-dangle */
 
-jest.mock('chokidar', () => {
-  const watch = () => ({
-    on() {
-      return watch()
-    },
-  })
-  return { watch }
-})
+
 
 test('works', () => {
   const wikic = new Wikic()
@@ -185,11 +179,7 @@ describe('build', () => {
   it('should call buildIndex if this.config.overwriteIndex is true', async () => {
     const wikic = new Wikic()
     const spy = jest.spyOn(wikic, 'buildIndex')
-    try {
-      await wikic.build()
-    } catch (e) {
-      expect(e).not.toBeDefined()
-    }
+    await wikic.build()
 
     expect(spy).toHaveBeenCalled()
     spy.mockReset()
@@ -214,17 +204,53 @@ describe('buildIndex', () => {
   it('throws if cannot find indexLayout in config', async () => {
     const wikic = new Wikic()
     wikic.config.indexLayout = ''
-    try {
-      await wikic.buildDocs()
-      await wikic.buildIndex()
-    } catch (e) {
-      expect(e.message).toBe('should set `indexLayout` in _config.json')
-    }
+    await wikic.buildDocs()
+    await wikic.buildIndex()
+    expect(logger.error.mock.calls[0][0].message).toBe('should set `indexLayout` in _config.json')
+    logger.error.mockClear()
   })
 })
 
-test('typeMap', () => {
-  const wikic = new Wikic()
-  expect(wikic.typeMap('css')).toBe('CSS')
-  expect(wikic.typeMap('bash')).toBe('Bash')
+describe('type of docs', () => {
+  it('typeMap', () => {
+    const wikic = new Wikic()
+    expect(wikic.typeMap('css')).toBe('CSS')
+    expect(wikic.typeMap('bash')).toBe('Bash')
+  })
+
+  it('getTypeLink', () => {
+    const wikic = new Wikic()
+    expect(wikic.getTypeLink(['css'])).toEqual({
+      url: '/wikic/css/',
+      value: 'CSS',
+    })
+    expect(wikic.getTypeLink(['frontend', 'css'])).toEqual({
+      url: '/wikic/frontend/css/',
+      value: 'CSS',
+    })
+    expect(wikic.getTypeLink(['xx', 'cc'])).toEqual({
+      url: '/wikic/xx/cc/',
+      value: 'Cc',
+    })
+  })
+
+  it('getTypeLinks', () => {
+    const wikic = new Wikic()
+    expect(wikic.getTypeLinks(['css'])).toEqual([{
+      url: '/wikic/css/',
+      value: 'CSS',
+    }])
+
+    expect(wikic.getTypeLinks(['frontend', 'css'])).toEqual([
+      {
+        url: '/wikic/frontend/',
+        value: 'FrontEnd',
+      },
+      {
+        url: '/wikic/frontend/css/',
+        value: 'CSS',
+      },
+    ])
+  })
 })
+
