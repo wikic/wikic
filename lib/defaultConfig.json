@@ -2,7 +2,6 @@
   "root": ".",
   "docsPath": "_note",
   "title": "",
-  "layout": "default",
   "overwriteIndex": false,
   "indexLayout": "",
   "baseurl": "",
@@ -10,5 +9,9 @@
   "layoutPath": "_layouts",
   "publicPath": "docs",
   "excludes": [],
-  "typeMap": {}
+  "typeMap": {},
+  "page": {
+    "layout": "default",
+    "toc": true
+  }
 }

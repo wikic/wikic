@@ -1,3 +1,5 @@
 {
-  "layout": "docs"
+  "page": {
+    "layout": "docs"
+  }
 }

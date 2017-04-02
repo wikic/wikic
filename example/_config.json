@@ -2,7 +2,6 @@
   "root": ".",
   "docsPath": "_note",
   "title": "Wikic Demo",
-  "layout": "default",
   "overwriteIndex": true,
   "indexLayout": "index",
   "baseurl": "wikic",
@@ -23,5 +22,9 @@
     "html": "HTML",
     "ecmascript": "ECMAScript",
     ".": "Home"
+  },
+  "page": {
+    "layout": "default",
+    "toc": true
   }
 }

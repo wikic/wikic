@@ -18,7 +18,7 @@ const logger = require('./lib/utils/log')
 const getConfig = require('./lib/utils/getConfig')
 const findDocs = require('./lib/utils/findDocs')
 const renderer = require('./lib/utils/renderer')
-const simpleServer = require('./lib/utils/server')
+const server = require('./lib/utils/server')
 const glob = require('./lib/utils/glob')
 const capitalize = require('./lib/utils/capitalize')
 
@@ -98,18 +98,10 @@ class Wikic {
 
   static renderMD(context) {
     const { data, config } = context
-    let layout
-    let title
-    if (!config.attributes) {
-      layout = config.layout
-    } else {
-      layout = config.attributes.layout || config.layout
-      title = config.attributes.title
-    }
-    const page = { title }
+    const layout = config.page.layout
     const renderContext = Object.assign({
       content: data,
-      page,
+      page: config.page,
     }, context.renderContext)
     const html = renderer.render(`${layout}.njk`, renderContext)
     return Object.assign(context, { data: html })
@@ -191,11 +183,11 @@ class Wikic {
   }
 
   serve() {
-    simpleServer({
+    server.create({
       port: this.config.port,
       getCwd: () => this.publicPath,
       getBaseurl: () => this.config.baseurl,
-    })
+    }).listen()
     return this
   }
 
@@ -235,9 +227,10 @@ class Wikic {
   }
 
   async buildIndex() {
-    if (!isObject(this.docsInfos) || Object.keys(this.docsInfos).length <= 0) {
+    if (!isObject(this.docsInfos)) {
       throw Error('require run buildDocs first.')
     }
+    if (Object.keys(this.docsInfos).length <= 0) return
     const dirs = await glob('**/', { cwd: this.docsPath })
     dirs.push('./')
 
@@ -273,7 +266,9 @@ class Wikic {
           config,
           to,
           afterReadTasks: [beforeRenderIndex],
+          beforeWriteTasks: [addTOC],
           skipRead: true,
+          tocSelectors: '.docs-list [data-level=1]',
         })
       }
     ))
