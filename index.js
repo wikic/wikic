@@ -68,9 +68,13 @@ class Wikic {
 
   async build() {
     this.clean()
-    await Promise.all([this.buildStaticFiles(), this.buildDocs()])
-    if (this.config.overwriteIndex) await this.buildIndex()
-    logger.verbose('site rendered!')
+    try {
+      await Promise.all([this.buildStaticFiles(), this.buildDocs()])
+      if (this.config.overwriteIndex) await this.buildIndex()
+      logger.verbose('site rendered!')
+    } catch (e) {
+      logger.error(e)
+    }
     return this
   }
 
@@ -239,7 +243,8 @@ class Wikic {
         throw Error('should set `indexLayout` in _config.json')
       }
       // overwrite config.layout -> index
-      const config = Object.assign({}, context.config, { layout: context.config.indexLayout })
+      const page = Object.assign({}, context.config.page, { layout: context.config.indexLayout })
+      const config = Object.assign({}, context.config, { page })
 
       const types = config.types
       const type = types.map((...arg) => this.typeMap(...arg)).join(' - ')
