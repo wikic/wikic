@@ -1378,6 +1378,14 @@ html-toc@^1.0.0:
     extend-shallow "^2.0.1"
     markdown-slug "^0.1.1"
 
+html-toc@dgeibi/html-toc:
+  version "1.0.1"
+  resolved "https://codeload.github.com/dgeibi/html-toc/tar.gz/66609a39e510ed00a8e52f51e2c5636dd81900b5"
+  dependencies:
+    cheerio "^0.22.0"
+    extend-shallow "^2.0.1"
+    markdown-slug "^0.1.1"
+
 htmlparser2@^3.9.1:
   version "3.9.2"
   resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-3.9.2.tgz#1bdf87acca0f3f9e53fa4fcceb0f4b4cbb00b338"
