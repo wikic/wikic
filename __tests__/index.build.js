@@ -9,9 +9,11 @@ jest.mock('../lib/utils/renderer')
 jest.mock('../lib/plugins/addTOC')
 jest.mock('../lib/plugins/load')
 
-const logger = require('../lib/utils/log')
+const chokidar = require('chokidar')
 const Wikic = require('../index')
 const glob = require('../lib/utils/glob')
+const logger = require('../lib/utils/log')
+const fsp = require('fs-promise')
 
 /* eslint-disable no-underscore-dangle */
 glob.__setPath('**/*', ['404.md', 'styles/main.css'])
@@ -30,103 +32,111 @@ const callThat = (key, afterCalling) => {
   })
 }
 
-describe('setup', () => {
-  callThat('setBaseURL', 'setup')
-  callThat('setConfig', 'setup')
+describe('wikic build', () => {
+  describe('setup', () => {
+    callThat('setBaseURL', 'setup')
+    callThat('setConfig', 'setup')
+  })
+
+  describe('setConfig', () => {
+    callThat('configureRenderer', 'setConfig')
+  })
+
+  describe('afterRead & beforeWrite', () => {
+    it('beforeWrite works', async () => {
+      const wikic = new Wikic()
+      const callback = jest.fn(context => context)
+      const length = wikic.beforeWriteTasks.length
+
+      expect(wikic.beforeWrite(callback)).toBe(wikic)
+      expect(wikic.beforeWriteTasks.length).toBe(length + 1)
+      await wikic.build()
+      expect(callback.mock.calls.length).not.toBeLessThan(1)
+    })
+
+    it('beforeWrite throws if not pass a function', () => {
+      const wikic = new Wikic()
+      try {
+        wikic.beforeWrite()
+      } catch (e) {
+        expect(e.message).toBe('should pass a function')
+      }
+    })
+
+    it('afterRead works', async () => {
+      const wikic = new Wikic()
+      const callback = jest.fn(context => context)
+      const length = wikic.afterReadTasks.length
+
+      expect(wikic.afterRead(callback)).toBe(wikic)
+      expect(wikic.afterReadTasks.length).toBe(length + 1)
+      await wikic.build()
+      expect(callback.mock.calls.length).not.toBeLessThan(1)
+    })
+
+    it('afterRead throws if not pass a function', () => {
+      const wikic = new Wikic()
+      try {
+        wikic.afterRead()
+      } catch (e) {
+        expect(e.message).toBe('should pass a function')
+      }
+    })
+  })
+
+  describe('build', () => {
+    it('call build() will call once only', () => {
+      const wikic = new Wikic()
+      wikic.build()
+      wikic.build()
+      expect(logger.error.mock.calls.length).toBe(1)
+      logger.error.mockClear()
+    })
+  })
+
+  describe('readMD', () => {
+    it('works if with from in context', async () => {
+      const wikic = new Wikic()
+      await wikic.readMD({
+        data: '',
+        config: {},
+      })
+    })
+
+    it('works if set skipRead and afterReadTasks', async () => {
+      const wikic = new Wikic()
+      await wikic.readMD({
+        from: '/path/to/',
+        data: '',
+        config: {},
+        afterReadTasks: [],
+        skipRead: true,
+      })
+    })
+  })
 })
 
-describe('setConfig', () => {
-  callThat('configureRenderer', 'setConfig')
-})
-
-describe('afterRead & beforeWrite', () => {
-  it('beforeWrite works', async () => {
+describe('watch', () => {
+    /* eslint-disable  no-underscore-dangle */
+  it('works', () => {
     const wikic = new Wikic()
-    const callback = jest.fn(context => context)
-    const length = wikic.beforeWriteTasks.length
+    wikic.watch()
+    const setup = jest.spyOn(wikic, 'setup')
+    const build = jest.spyOn(wikic, 'build')
 
-    expect(wikic.beforeWrite(callback)).toBe(wikic)
-    expect(wikic.beforeWriteTasks.length).toBe(length + 1)
-    await wikic.build()
-    expect(callback.mock.calls.length).not.toBeLessThan(1)
-  })
+    chokidar.__emiter.emit('change', '/path/to/')
+    expect(setup).toHaveBeenCalled()
+    expect(build).toHaveBeenCalled()
+    setup.mockReset()
+    setup.mockRestore()
+    build.mockReset()
+    build.mockRestore()
 
-  it('beforeWrite throws if not pass a function', () => {
-    const wikic = new Wikic()
-    try {
-      wikic.beforeWrite()
-    } catch (e) {
-      expect(e.message).toBe('should pass a function')
-    }
-  })
+    chokidar.__emiter.emit('unlink', 'text.txt')
+    expect(fsp.removeSync.mock.calls[0][0]).toMatch('docs/text.txt')
 
-  it('afterRead works', async () => {
-    const wikic = new Wikic()
-    const callback = jest.fn(context => context)
-    const length = wikic.afterReadTasks.length
-
-    expect(wikic.afterRead(callback)).toBe(wikic)
-    expect(wikic.afterReadTasks.length).toBe(length + 1)
-    await wikic.build()
-    expect(callback.mock.calls.length).not.toBeLessThan(1)
-  })
-
-  it('afterRead throws if not pass a function', () => {
-    const wikic = new Wikic()
-    try {
-      wikic.afterRead()
-    } catch (e) {
-      expect(e.message).toBe('should pass a function')
-    }
-  })
-})
-
-describe('build', () => {
-  callThat('clean', 'build')
-  callThat('buildStaticFiles', 'build')
-  callThat('buildDocs', 'build')
-
-  it('should not call buildIndex if this.config.overwriteIndex is false', async () => {
-    const wikic = new Wikic()
-    const spy = jest.spyOn(wikic, 'buildIndex')
-    wikic.config.overwriteIndex = false
-    await wikic.build()
-    expect(spy).not.toHaveBeenCalled()
-    spy.mockReset()
-    spy.mockRestore()
-  })
-
-  it('should call buildIndex if this.config.overwriteIndex is true', async () => {
-    const wikic = new Wikic()
-    const spy = jest.spyOn(wikic, 'buildIndex')
-    await wikic.build()
-
-    expect(spy).toHaveBeenCalled()
-    spy.mockReset()
-    spy.mockRestore()
-  })
-})
-
-describe('buildDocs', () => {
-  callThat('buildMD', 'buildDocs')
-})
-
-describe('buildIndex', () => {
-  it('throws if not run buildDocs first', async () => {
-    const wikic = new Wikic()
-    try {
-      await wikic.buildIndex()
-    } catch (e) {
-      expect(e.message).toBe('require run buildDocs first.')
-    }
-  })
-
-  it('throws if cannot find indexLayout in config', async () => {
-    const wikic = new Wikic()
-    wikic.config.indexLayout = ''
-    await wikic.buildDocs()
-    await wikic.buildIndex()
-    expect(logger.error.mock.calls[0][0].message).toBe('should set `indexLayout` in _config.json')
-    logger.error.mockClear()
+    chokidar.__emiter.emit('error', Error('oops'))
+    expect(logger.error.mock.calls.length).toBe(1)
+    expect(logger.error.mock.calls[0][0]).toMatch('Error: oops')
   })
 })

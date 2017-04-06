@@ -1,7 +1,8 @@
+const EventEmitter = require('events')
+/* eslint-disable no-underscore-dangle */
+const emiter = new EventEmitter()
 const chokidar = jest.genMockFromModule('chokidar')
-const watch = jest.fn(() => ({
-  on: jest.fn(() => watch()),
-}))
-chokidar.watch = watch
+chokidar.watch = jest.fn(() => emiter)
+chokidar.__emiter = emiter
 
 module.exports = chokidar

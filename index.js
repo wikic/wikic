@@ -2,7 +2,7 @@
 const fsp = require('fs-promise')
 const path = require('path')
 const chokidar = require('chokidar')
-const isObject = require('isobject')
+// const isObject = require('isobject')
 
 const load = require('./lib/plugins/load')
 const fillInfo = require('./lib/plugins/fillInfo')
@@ -10,20 +10,21 @@ const mdFilter = require('./lib/plugins/mdFilter')
 const fmFilter = require('./lib/plugins/fmFilter')
 const addTOC = require('./lib/plugins/addTOC')
 
-const getNav = require('./lib/views/getNav')
 const getList = require('./lib/views/getList')
 
 const { isString, isFunction } = require('./lib/utils/typeof')
 const logger = require('./lib/utils/log')
 const getConfig = require('./lib/utils/getConfig')
-const findDocs = require('./lib/utils/findDocs')
+// const findDocs = require('./lib/utils/findDocs')
 const renderer = require('./lib/utils/renderer')
 const server = require('./lib/utils/server')
 const glob = require('./lib/utils/glob')
 const capitalize = require('./lib/utils/capitalize')
 
+
 class Wikic {
   constructor(cwd) {
+    this.building = false
     this.afterReadTasks = [fmFilter, mdFilter] // after read before render
     this.beforeWriteTasks = [] // after render before write
     this.setup(cwd)
@@ -36,7 +37,7 @@ class Wikic {
     })
     renderer.env.addGlobal('site', this.config)
     renderer.env.addFilter('typeMap', (...arg) => this.typeMap(...arg))
-    renderer.env.addFilter('absolute', (...arg) => this.getURL(...arg))
+    renderer.env.addFilter('baseurl', (...arg) => this.getURL(...arg))
     return this
   }
 
@@ -60,21 +61,26 @@ class Wikic {
     return this
   }
 
-  clean() {
-    fsp.emptyDirSync(this.publicPath)
+  async clean() {
+    await fsp.emptyDir(this.publicPath)
     logger.verbose('site cleaned!')
     return this
   }
 
   async build() {
-    this.clean()
+    if (this.building) {
+      logger.error('Wikic is busy.')
+      return this
+    }
+    this.building = true
+    await this.clean()
     try {
       await Promise.all([this.buildStaticFiles(), this.buildDocs()])
-      if (this.config.overwriteIndex) await this.buildIndex()
       logger.verbose('site rendered!')
     } catch (e) {
       logger.error(e)
     }
+    this.building = false
     return this
   }
 
@@ -197,87 +203,53 @@ class Wikic {
 
   async buildDocs() {
     this.docsInfos = {} // reset docsInfos
-    const beforeRenderDoc = (context) => {
-      const { config } = context
-
-      const navbar = getNav(config.types, this)
-      const type = config.types.map((...arg) => this.typeMap(...arg)).join(' - ')
-      const renderContext = Object.assign({}, context.renderContext, { navbar, type })
-
-      return Object.assign(context, { renderContext })
-    }
 
     const files = await glob('**/*.md', { cwd: this.docsPath })
-    await Promise.all(files.map(
-      async (filePath) => {
-        const targetRelative = filePath.replace(/\.md$/, '.html')
+    const contexts = await Promise.all(files.map(filePath => this._readDoc(filePath)))
 
-        const from = path.join(this.docsPath, filePath)
-        const to = path.join(this.publicPath, targetRelative)
-
-        const types = path.dirname(filePath).split('/')
-        const address = path.join('/', targetRelative)
-        const config = Object.assign({}, this.config, { types, address })
-
-        await this.buildMD({
-          from,
-          to,
-          config,
-          afterReadTasks: [fillInfo, beforeRenderDoc],
-          beforeWriteTasks: [addTOC],
-        })
-      }
-    ))
+    this.list = getList(this)
+    await Promise.all(
+      contexts
+        .map(context => this._beforeRenderDoc(context))
+        .map(context => Wikic.renderMD(context))
+        .map(context => this.writeMD(context))
+    )
   }
 
-  async buildIndex() {
-    if (!isObject(this.docsInfos)) {
-      throw Error('require run buildDocs first.')
-    }
-    if (Object.keys(this.docsInfos).length <= 0) return
-    const dirs = await glob('**/', { cwd: this.docsPath })
-    dirs.push('./')
+  _beforeRenderDoc(context) {
+    const { config, renderContext: oldRenderContext } = context
 
-    const beforeRenderIndex = (context) => {
-      if (!isString(context.config.indexLayout) || context.config.indexLayout === '') {
-        throw Error('should set `indexLayout` in _config.json')
+    const type = config.types.map((...arg) => this.typeMap(...arg)).join(' - ')
+    const renderContext = Object.assign(
+      {}, oldRenderContext,
+      {
+        type,
+        list: this.list,
       }
-      // overwrite config.layout -> index
-      const page = Object.assign({}, context.config.page, { layout: context.config.indexLayout })
-      const config = Object.assign({}, context.config, { page })
+    )
 
-      const types = config.types
-      const type = types.map((...arg) => this.typeMap(...arg)).join(' - ')
-
-
-      // get content of index
-      const collections = (types[0] === '.') ? this.docsInfos : findDocs(this.docsInfos, types)
-      const data = getList(types, collections, this)
-      const navbar = getNav(types, this)
-
-      const renderContext = Object.assign({}, context.renderContext, { navbar, type })
-
-      return Object.assign(context, { data, renderContext, config })
-    }
-
-    await Promise.all(dirs.map(
-      async (dir) => {
-        const dirname = dir.slice(0, dir.length - 1) // ignore `/`
-        const types = dirname.split('/')
-        const to = path.join(this.publicPath, dirname, 'index.html')
-        const address = path.join('/', dirname, '/')
-        const config = Object.assign({}, this.config, { types, address })
-        await this.buildMD({
-          config,
-          to,
-          afterReadTasks: [beforeRenderIndex],
-          beforeWriteTasks: [addTOC],
-          skipRead: true,
-          tocSelectors: '.docs-list [data-level=1]',
-        })
-      }
-    ))
+    return Object.assign(context, { renderContext })
   }
+
+  _readDoc(filePath) {
+    const targetRelative = filePath.replace(/\.md$/, '.html')
+
+    const from = path.join(this.docsPath, filePath)
+    const to = path.join(this.publicPath, targetRelative)
+
+    const types = path.dirname(filePath).split('/')
+    const address = path.join('/', targetRelative)
+    const config = Object.assign({}, this.config, { types, address })
+
+    return this.readMD({
+      from,
+      to,
+      config,
+      afterReadTasks: [fillInfo],
+      beforeWriteTasks: [addTOC],
+    })
+  }
+
 
   async buildStaticFiles() {
     const { excludes, publicPath } = this.config

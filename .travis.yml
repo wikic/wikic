@@ -6,14 +6,4 @@ cache:
   yarn: true
 
 script:
-- npm run build
 - npm run coveralls
-
-deploy:
-  local_dir: docs
-  provider: pages
-  skip_cleanup: true
-  github_token: $token
-  on:
-    branch: master
-  target_branch: gh-pages

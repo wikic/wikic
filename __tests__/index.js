@@ -5,6 +5,7 @@ jest.mock('../lib/utils/log')
 jest.mock('../lib/utils/getConfig')
 
 const Wikic = require('../index')
+const server = require('../lib/utils/server')
 
 test('has these properties', () => {
   const wikic = new Wikic()
@@ -19,8 +20,17 @@ test('has these properties', () => {
 
 test('return this', () => {
   const wikic = new Wikic()
-  const keys = ['clean', 'configureRenderer', 'setConfig', 'setup', 'watch', 'serve', 'setBaseURL']
+  const keys = ['configureRenderer', 'setConfig', 'setup', 'watch', 'serve', 'setBaseURL']
   keys.forEach((key) => {
     expect(wikic[key]()).toBe(wikic)
   })
+})
+
+describe('serve', () => {
+  const wikic = new Wikic()
+  wikic.serve()
+  const { port, getCwd, getBaseurl } = server.create.mock.calls[0][0]
+  expect(port).toBe(wikic.config.port)
+  expect(getBaseurl()).toBe(wikic.config.baseurl)
+  expect(getCwd()).toBe(wikic.publicPath)
 })

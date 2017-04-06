@@ -1,14 +1,12 @@
 {
   "name": "wikic",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "private": true,
   "description": "a static wiki generator",
   "main": "index.js",
   "author": "dgeibi",
   "license": "MIT",
   "scripts": {
-    "start": "node start.js",
-    "build": "cd example && node index.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "test": "jest",
@@ -37,9 +35,6 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-no-async-without-await": "^1.2.0",
     "jest": "^19.0.2"
-  },
-  "directories": {
-    "example": "example"
   },
   "repository": {
     "type": "git",

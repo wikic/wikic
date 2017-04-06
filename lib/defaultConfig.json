@@ -2,8 +2,6 @@
   "root": ".",
   "docsPath": "_note",
   "title": "",
-  "overwriteIndex": false,
-  "indexLayout": "",
   "baseurl": "",
   "port": 4000,
   "layoutPath": "_layouts",
