@@ -2,7 +2,6 @@
 const fsp = require('fs-promise')
 const path = require('path')
 const chokidar = require('chokidar')
-// const isObject = require('isobject')
 
 const load = require('./lib/plugins/load')
 const fillInfo = require('./lib/plugins/fillInfo')
@@ -12,15 +11,13 @@ const addTOC = require('./lib/plugins/addTOC')
 
 const getList = require('./lib/views/getList')
 
-const { isString, isFunction } = require('./lib/utils/typeof')
+const { isString, isFunction, isMarkdown } = require('./lib/utils/typeof')
 const logger = require('./lib/utils/log')
 const getConfig = require('./lib/utils/getConfig')
-// const findDocs = require('./lib/utils/findDocs')
 const renderer = require('./lib/utils/renderer')
 const server = require('./lib/utils/server')
 const glob = require('./lib/utils/glob')
 const capitalize = require('./lib/utils/capitalize')
-
 
 class Wikic {
   constructor(cwd) {
@@ -36,8 +33,8 @@ class Wikic {
       watch: false,
     })
     renderer.env.addGlobal('site', this.config)
-    renderer.env.addFilter('typeMap', (...arg) => this.typeMap(...arg))
-    renderer.env.addFilter('baseurl', (...arg) => this.getURL(...arg))
+    renderer.env.addFilter('typeMap', key => this.typeMap(key))
+    renderer.env.addFilter('baseurl', url => this.getURL(url))
     return this
   }
 
@@ -54,10 +51,9 @@ class Wikic {
     return this
   }
 
-  setup(cwd = (this.cwd || process.cwd())) {
+  setup(cwd = this.cwd || process.cwd()) {
     this.cwd = path.resolve(cwd)
     this.setConfig()
-      .setBaseURL()
     return this
   }
 
@@ -102,17 +98,16 @@ class Wikic {
     return this
   }
 
-  static isMarkdown(filePath) {
-    return path.extname(filePath) === '.md'
-  }
-
   static renderMD(context) {
     const { data, config } = context
     const layout = config.page.layout
-    const renderContext = Object.assign({
-      content: data,
-      page: config.page,
-    }, context.renderContext)
+    const renderContext = Object.assign(
+      {
+        content: data,
+        page: config.page,
+      },
+      context.renderContext
+    )
     const html = renderer.render(`${layout}.njk`, renderContext)
     return Object.assign(context, { data: html })
   }
@@ -146,8 +141,9 @@ class Wikic {
   }
 
   async readMD(context) {
-    const promiseRead = isString(context.from) ?
-      load(context) : Promise.resolve(context)
+    const promiseRead = isString(context.from)
+      ? load(context)
+      : Promise.resolve(context)
 
     let callbacks
     if (Array.isArray(context.afterReadTasks)) {
@@ -170,16 +166,17 @@ class Wikic {
   }
 
   watch() {
-    chokidar.watch('**/*', {
-      cwd: this.root,
-      ignored: [
-        /(^|[/\\])\../,
-        `${this.config.publicPath}/**`,
-        '**/node_modules/**',
-        ...this.config.excludes,
-      ],
-      persistent: true,
-    })
+    chokidar
+      .watch('**/*', {
+        cwd: this.root,
+        ignored: [
+          /(^|[/\\])\../,
+          `${this.config.publicPath}/**`,
+          '**/node_modules/**',
+          ...this.config.excludes,
+        ],
+        persistent: true,
+      })
       .on('change', (filePath) => {
         logger.verbose(`File ${filePath} has been changed`)
         this.setup().build()
@@ -193,11 +190,13 @@ class Wikic {
   }
 
   serve() {
-    server.create({
-      port: this.config.port,
-      getCwd: () => this.publicPath,
-      getBaseurl: () => this.config.baseurl,
-    }).listen()
+    server
+      .create({
+        port: this.config.port,
+        getCwd: () => this.publicPath,
+        getBaseurl: () => this.config.baseurl,
+      })
+      .listen()
     return this
   }
 
@@ -205,7 +204,9 @@ class Wikic {
     this.docsInfos = {} // reset docsInfos
 
     const files = await glob('**/*.md', { cwd: this.docsPath })
-    const contexts = await Promise.all(files.map(filePath => this._readDoc(filePath)))
+    const contexts = await Promise.all(
+      files.map(filePath => this._readDoc(filePath))
+    )
 
     this.list = getList(this)
     await Promise.all(
@@ -220,13 +221,10 @@ class Wikic {
     const { config, renderContext: oldRenderContext } = context
 
     const type = config.types.map((...arg) => this.typeMap(...arg)).join(' - ')
-    const renderContext = Object.assign(
-      {}, oldRenderContext,
-      {
-        type,
-        list: this.list,
-      }
-    )
+    const renderContext = Object.assign({}, oldRenderContext, {
+      type,
+      list: this.list,
+    })
 
     return Object.assign(context, { renderContext })
   }
@@ -250,38 +248,29 @@ class Wikic {
     })
   }
 
-
   async buildStaticFiles() {
     const { excludes, publicPath } = this.config
     const files = await glob('**/*', {
       cwd: this.root,
       nodir: true,
-      ignore: [
-        `${publicPath}/**`,
-        '_*/**',
-        '**/node_modules/**',
-        ...excludes,
-      ],
+      ignore: [`${publicPath}/**`, '_*/**', '**/node_modules/**', ...excludes],
     })
-    await Promise.all(files.map(async (filePath) => {
-      const from = path.join(this.root, filePath)
-      const to = path.join(this.publicPath, filePath)
-      if (Wikic.isMarkdown(from)) {
-        const config = Object.assign({}, this.config)
-        await this.buildMD({
-          from,
-          to: to.replace(/\.md$/, '.html'),
-          config,
-        })
-      } else {
-        await fsp.copy(from, to)
-      }
-    }))
-  }
-
-  setBaseURL(url = this.config.baseurl) {
-    this.baseurl = `/${url}`
-    return this
+    await Promise.all(
+      files.map(async (filePath) => {
+        const from = path.join(this.root, filePath)
+        const to = path.join(this.publicPath, filePath)
+        if (isMarkdown(from)) {
+          const config = Object.assign({}, this.config)
+          await this.buildMD({
+            from,
+            to: to.replace(/\.md$/, '.html'),
+            config,
+          })
+        } else {
+          await fsp.copy(from, to)
+        }
+      })
+    )
   }
 
   typeMap(key) {
@@ -293,27 +282,7 @@ class Wikic {
   }
 
   getURL(url) {
-    return path.join(this.baseurl, url)
-  }
-
-  getTypeLinks(types) {
-    const handleType = (type, idx, arr) => {
-      const url = this.getTypeURL(arr.slice(0, idx + 1))
-      const value = this.typeMap(type)
-      return { url, value }
-    }
-    return types.map(handleType)
-  }
-
-  getTypeLink(types) {
-    const type = types[types.length - 1]
-    const url = this.getTypeURL(types)
-    const value = this.typeMap(type)
-    return { url, value }
-  }
-
-  getTypeURL(types) {
-    return path.join(this.baseurl, ...types, '/')
+    return path.join('/', this.config.baseurl, url)
   }
 }
 

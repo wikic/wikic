@@ -20,7 +20,7 @@ test('has these properties', () => {
 
 test('return this', () => {
   const wikic = new Wikic()
-  const keys = ['configureRenderer', 'setConfig', 'setup', 'watch', 'serve', 'setBaseURL']
+  const keys = ['configureRenderer', 'setConfig', 'setup', 'watch', 'serve']
   keys.forEach((key) => {
     expect(wikic[key]()).toBe(wikic)
   })

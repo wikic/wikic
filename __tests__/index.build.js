@@ -34,7 +34,6 @@ const callThat = (key, afterCalling) => {
 
 describe('wikic build', () => {
   describe('setup', () => {
-    callThat('setBaseURL', 'setup')
     callThat('setConfig', 'setup')
   })
 
@@ -117,7 +116,7 @@ describe('wikic build', () => {
 })
 
 describe('watch', () => {
-    /* eslint-disable  no-underscore-dangle */
+  /* eslint-disable  no-underscore-dangle */
   it('works', () => {
     const wikic = new Wikic()
     wikic.watch()
