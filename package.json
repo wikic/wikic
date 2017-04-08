@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "private": true,
   "description": "a static wiki generator",
-  "main": "index.js",
+  "main": "lib/index.js",
   "author": "dgeibi",
   "license": "MIT",
   "scripts": {
