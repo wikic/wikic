@@ -69,7 +69,6 @@ class Wikic {
       return this
     }
     this.building = true
-    await this.clean()
     try {
       await Promise.all([this.buildStaticFiles(), this.buildDocs()])
       logger.verbose('site rendered!')
@@ -141,9 +140,7 @@ class Wikic {
   }
 
   async readMD(context) {
-    const promiseRead = isString(context.from)
-      ? load(context)
-      : Promise.resolve(context)
+    const promiseRead = isString(context.from) ? load(context) : Promise.resolve(context)
 
     let callbacks
     if (Array.isArray(context.afterReadTasks)) {
@@ -166,15 +163,31 @@ class Wikic {
   }
 
   watch() {
+    /* ignore all the files start _ (exclude layoutPath and docsPath */
+    const ignored = [
+      /(^|[/\\])\../,
+      `${this.config.publicPath}/**`,
+      '**/node_modules/**',
+      ...this.config.excludes,
+    ]
+
+    const startWith_ = [];
+    [this.config.layoutPath, this.config.docsPath].forEach((pathname) => {
+      if (/^_.+/.test(pathname)) {
+        startWith_.push(pathname.replace(/^_/, ''))
+      }
+    })
+
+    if (startWith_.length > 0) {
+      ignored.push(`_!(${startWith_.join('|')})/*`)
+    } else {
+      ignored.push('_*/**')
+    }
+
     chokidar
       .watch('**/*', {
+        ignored,
         cwd: this.root,
-        ignored: [
-          /(^|[/\\])\../,
-          `${this.config.publicPath}/**`,
-          '**/node_modules/**',
-          ...this.config.excludes,
-        ],
         persistent: true,
       })
       .on('change', (filePath) => {
@@ -204,9 +217,7 @@ class Wikic {
     this.docsInfos = {} // reset docsInfos
 
     const files = await glob('**/*.md', { cwd: this.docsPath })
-    const contexts = await Promise.all(
-      files.map(filePath => this._readDoc(filePath))
-    )
+    const contexts = await Promise.all(files.map(filePath => this._readDoc(filePath)))
 
     this.list = getList(this)
     await Promise.all(
