@@ -832,6 +832,10 @@ es6-weak-map@^2.0.1:
     es6-iterator "^2.0.1"
     es6-symbol "^3.1.1"
 
+escape-html@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
+
 escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
@@ -1357,10 +1361,11 @@ html-encoding-sniffer@^1.0.1:
     whatwg-encoding "^1.0.1"
 
 html-toc@dgeibi/html-toc:
-  version "1.0.1"
-  resolved "https://codeload.github.com/dgeibi/html-toc/tar.gz/66609a39e510ed00a8e52f51e2c5636dd81900b5"
+  version "1.0.2"
+  resolved "https://codeload.github.com/dgeibi/html-toc/tar.gz/660b1d0b3e651dbb0171cade07a89635cd2913bb"
   dependencies:
     cheerio "^0.22.0"
+    escape-html "^1.0.3"
     extend-shallow "^2.0.1"
     markdown-slug "^0.1.1"
 
