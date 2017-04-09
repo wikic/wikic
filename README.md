@@ -3,7 +3,7 @@ Wikic
 
 [![Build Status](https://travis-ci.org/dgeibi/wikic.svg?branch=master)](https://travis-ci.org/dgeibi/wikic) [![Coveralls](https://img.shields.io/coveralls/dgeibi/wikic.svg)](https://coveralls.io/github/dgeibi/wikic)
 
-a simple static document generator
+a simple static site generator
 
 ## Getting started
 
