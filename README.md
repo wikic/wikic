@@ -1,6 +1,10 @@
 # Wikic
 
-[![Build Status](https://travis-ci.org/dgeibi/wikic.svg?branch=master)](https://travis-ci.org/dgeibi/wikic) [![Coveralls](https://img.shields.io/coveralls/dgeibi/wikic.svg)](https://coveralls.io/github/dgeibi/wikic)
+[![Build Status][build-badge]][build]
+[![Coveralls][coverage-badge]][coverage]
+[![MIT License][license-badge]][license]
+[![version][version-badge]][package]
+[![Node][node-badge]][node]
 
 a simple static site generator
 
@@ -9,11 +13,11 @@ a simple static site generator
 ### Installation
 
 ``` bash
-npm install --save dgeibi/wikic
+npm install --save wikic
 
 #or
 
-yarn add dgeibi/wikic
+yarn add wikic
 ```
 
 ### Configuration and Front Matter
@@ -179,4 +183,15 @@ Serves the files in PublicPath
 
 ## LICENSE
 
-[MIT](LICENSE)
+[MIT][license]
+
+[license]: https://raw.githubusercontent.com/dgeibi/wikic/master/LICENSE
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[coverage]: https://coveralls.io/github/dgeibi/wikic
+[coverage-badge]: https://img.shields.io/coveralls/dgeibi/wikic.svg
+[build]: https://travis-ci.org/dgeibi/wikic
+[build-badge]: https://travis-ci.org/dgeibi/wikic.svg?branch=master
+[node]: https://nodejs.org
+[node-badge]: https://img.shields.io/badge/node-%3E%3D%207.0.0-brightgreen.svg
+[version-badge]: https://img.shields.io/npm/v/wikic.svg
+[package]: https://www.npmjs.com/package/wikic
