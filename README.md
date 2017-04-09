@@ -21,7 +21,7 @@ yarn add dgeibi/wikic
 
 [Default Config](lib/defaultConfig.yml)
 
-You can create `_config.yml` to override defaultConfig.The `_config.yml` in `wikic.cwd` will be loaded as global config. The `_config.yml` closest to markdown will override config. Front Matter in each markdown will override `config.page` respectively.
+You can create `_config.yml`(s) to override defaultConfig. The `_config.yml` in `wikic.cwd` will be loaded as global config. The `_config.yml` closest to markdown will override config. Front Matter in each markdown will override `config.page` respectively.
 
 Front Matter example:
 
@@ -37,6 +37,35 @@ hide: true # hide this page from docs list(only necessary for file in docsPath)
 ### Layouts
 
 You can create [Nunjucks](https://mozilla.github.io/nunjucks/templating.html) templates (extname is `.njk`) in `layoutPath` and set `page.layout` or `layout` in front matter to template's filename.
+
+#### Builtin Filter
+
+- `typeMap`: see [wikic.typeMap(key)](#wikictypemapkey)
+- `baseurl`: see [wikic.getURL(url)](#wikicgeturlurl)
+
+#### Nunjucks in Markdown
+
+Not support builtin filter above. Varibale `site` and `page` is available. `site` is a reference of `context.config` and `page` is a shortcut for `context.config.page`.
+
+`{{`, `}}`, `{#`, `#}`, `{%`, `%}` in raw blocks and `<code>` blocks can be escaped.
+
+``` html
+<!-- markdown -->
+{% raw %}
+{{ page.title }}
+{% endraw %}
+
+<!-- output -->
+{{ page.title }}
+```
+
+``` html
+<!-- markdown -->
+`{{ page.title }}`
+
+<!-- output -->
+<code>{{ page.title }}</code>
+```
 
 ## Example
 
