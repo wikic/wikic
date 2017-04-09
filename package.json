@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "description": "a static wiki generator",
   "main": "lib/index.js",

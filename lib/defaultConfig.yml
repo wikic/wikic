@@ -1,12 +1,35 @@
 root: .
-title: ''
-baseurl: ''
-port: 4000
+# root dir of files, relative to `wikic.cwd`
+# `wikic.cwd` 's default value is process.cwd()
+# initialize wikic with `new Wikic('path/to')` or `wikic.setup('path/to') to set wikic.cwd
+
 docsPath: _notes
+# dir where documents place, relative to `root`
+
 layoutPath: _layouts
+# dir where nunjunks layouts place, relative to `root`
+
 publicPath: docs
+# site destination, relative to `root`
+
+title: ''
+# title of site
+
+baseurl: ''
+# site base URL
+
+port: 4000
+# static server port
+
 excludes: []
+# directories and files to ignore, support glob, relative to `root`
+
 typeMap: {}
+# map from dirname to typeName
+
 page:
+# default page config
   layout: default
+  # default layout name
   toc: true
+  # enable/disable table of content
