@@ -1,0 +1,12 @@
+root: .
+title: ''
+baseurl: ''
+port: 4000
+docsPath: _notes
+layoutPath: _layouts
+publicPath: docs
+excludes: []
+typeMap: {}
+page:
+  layout: default
+  toc: true
