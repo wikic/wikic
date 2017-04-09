@@ -1,5 +1,4 @@
-Wikic
----
+# Wikic
 
 [![Build Status](https://travis-ci.org/dgeibi/wikic.svg?branch=master)](https://travis-ci.org/dgeibi/wikic) [![Coveralls](https://img.shields.io/coveralls/dgeibi/wikic.svg)](https://coveralls.io/github/dgeibi/wikic)
 
@@ -27,10 +26,10 @@ Front Matter example:
 
 ``` yaml
 ---
-title: Hello World # title of page
+title: Hello World # title of the page
 toc: false # disable toc for this page
 layout: docs # set layout for this page
-hide: true # hide this page from docs list(only necessary for file in docsPath)
+hide: true # hide this page from docs list(only necessary for the file in docsPath)
 ---
 ```
 
@@ -45,7 +44,7 @@ You can create [Nunjucks](https://mozilla.github.io/nunjucks/templating.html) te
 
 #### Nunjucks in Markdown
 
-Not support builtin filter above. Varibale `site` and `page` is available. `site` is a reference of `context.config` and `page` is a shortcut for `context.config.page`.
+Not support builtin filter above. Variable `site` and `page` is available. `site` is a reference of `context.config` and `page` is a shortcut for `context.config.page`.
 
 `{{`, `}}`, `{#`, `#}`, `{%`, `%}` in raw blocks and `<code>` blocks can be escaped.
 
@@ -168,8 +167,8 @@ Serves the files in PublicPath
 
 ### wikic.getURL(url)
 
-- url: String, path that relative to root
-- Returns a absolute URL prefixed with base URL
+- url: String, the path that relative to root
+- Returns an absolute URL prefixed with base URL
 
 ## Thanks
 
