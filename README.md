@@ -101,7 +101,7 @@ You can create [Nunjucks](https://mozilla.github.io/nunjucks/templating.html) te
 
 For markdown in 'docsPath'
 
-- `list`, String, list of documents in `docsPath`, See also [wikic.setListTemplate](wikicsetlisttemplateopts)
+- `list`, String, list of documents in `docsPath`, See also [wikic.setListTemplate](#wikicsetlisttemplateopts)
 
 #### Builtin Filter
 
@@ -211,7 +211,7 @@ Serves the files in PublicPath
 - opts: Object, contains document list templates
 - Returns `this`
 
-See defaultOptions in [utils/getList.js](utils/getList.js)
+See defaultOptions in [lib/utils/getList.js](lib/utils/getList.js)
 
 ## Thanks
 
