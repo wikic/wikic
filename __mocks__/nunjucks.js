@@ -8,4 +8,6 @@ const configure = jest.fn(() => {
   return renderer
 })
 
-module.exports = { configure }
+const renderString = jest.fn(() => '')
+
+module.exports = { configure, renderString }
