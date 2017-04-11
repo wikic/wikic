@@ -45,7 +45,7 @@ yarn add wikic
 
 ### Plugins
 
-`Plugin` is a `Function`, which receives a `context` (Object) and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
+A plugin is a `Function`, which receives a `context` (Object) and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
 
 A `context` passed to a plugin is an Object which contains some of the following properties:
 
@@ -57,7 +57,7 @@ A `context` passed to a plugin is an Object which contains some of the following
 - renderContext: Object, nunjucks render context, contains [variables for layout](#variablesinlayouts)
 - IS_DOC: Boolean, whether in docsPath
 
-Add plugins by [wikic.beforeWrite](#wikicbeforewriteplugin) or [wikic.afterRead](#wikicafterreadplugin)
+Add a plugin by passing it to [wikic.beforeWrite](#wikicbeforewriteplugin) or [wikic.afterRead](#wikicafterreadplugin).
 
 ### Configuration and Front Matter
 
