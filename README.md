@@ -45,7 +45,7 @@ yarn add wikic
 
 ### Plugins
 
-`Plugin` is a `Function`, which receives a `context` (Object) passed to and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
+`Plugin` is a `Function`, which receives a `context` (Object) and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
 
 A `context` passed to a plugin is an Object which contains some of the following properties.
 
