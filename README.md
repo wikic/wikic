@@ -21,7 +21,7 @@ const Wikic = require('wikic')
 const wikic = new Wikic()
 
 // add plugin to minify html before write
-wikic.beforeWrite((context) => {
+wikic.beforeWrite(function minify(context) {
   if (!context.data) return context
   const html = htmlclean(context.data)
   return Object.assign({}, context, { data: html })
@@ -47,7 +47,7 @@ yarn add wikic
 
 `Plugin` is a `Function`, which receives a `context` (Object) and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
 
-A `context` passed to a plugin is an Object which contains some of the following properties.
+A `context` passed to a plugin is an Object which contains some of the following properties:
 
 - src: String, absolute path of source
 - dist: String, absolute path of destination
@@ -61,17 +61,15 @@ Add plugins by [wikic.beforeWrite](#wikicbeforewriteplugin) or [wikic.afterRead]
 
 ### Configuration and Front Matter
 
-`wikic` is an instance of Wikic.
-
 [Default Config](lib/defaultConfig.yml)
 
 You can create `_config.yml`(s) to override defaultConfig.
 
 Here is an inheritance chain of configuration:
 
-- DefaultConfig,  _config.yml(in wikic.cwd) => `wikic.config`
-- `wikic.config`, _config.yml(subdirectory of wikic.cwd, closest to markdown file) => `context.site`
-- `context.page`, `context.site.page`, Front Matter in markdown => context.page
+- 'defaultConfig',  `_config.yml` (in `wikic.cwd`) => `wikic.config`
+- `wikic.config`, `_config.yml` (subdirectory of `wikic.cwd`, closest to markdown file) => `context.site`
+- `context.page`, `context.site.page`, Front Matter in markdown => `context.page`
 
 The `_config.yml` in `wikic.cwd` will be loaded as `wikic.config`.
 
@@ -177,15 +175,7 @@ Builds both Files in `docsPath` and `root`
 
 Pushes a plugin into task queue in which plugin will be invoked before writing each markdown file in order.
 
-The plugin should receive a context and return a context.
-
-``` javascript
-wikic.beforeWrite((context) => {
-  if (!context.data) return context
-  const html = htmlclean(context.data)
-  return Object.assign({}, context, { data: html })
-})
-```
+See [Plugins](#plugins)
 
 ### wikic.afterRead(plugin)
 
