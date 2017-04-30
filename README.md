@@ -55,7 +55,7 @@ A `context` passed to a plugin is an Object which contains some of the following
 - site: Object, site config
 - page: Object, page config
 - renderContext: Object, nunjucks render context, contains [`variables in layouts`](#variables-in-layouts)
-- IS_DOC: Boolean, whether in docsPath
+- IS_DOC: boolean, whether in docsPath
 
 Add a plugin by passing it to [`wikic.beforeWrite`](#wikicbeforewriteplugin) or [`wikic.afterRead`](#wikicafterreadplugin).
 
@@ -101,7 +101,7 @@ You can create [Nunjucks](https://mozilla.github.io/nunjucks/templating.html) te
 
 For markdown in 'docsPath'
 
-- `list`, string, list of documents in `docsPath`, See also [wikic.setListTemplate](#wikicsetlisttemplateopts)
+- `list`, string, list of documents in `docsPath`, See also [`wikic.setListTemplate(opts)`](#wikicsetlisttemplateopts)
 
 #### Builtin Filter
 
