@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "format": "prettier-eslint --write './index.js' './lib/**/*.js'",
+    "format": "prettier-eslint --write './index.js' './lib/**/*.js' './__mocks__/**/*.js'",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
