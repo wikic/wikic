@@ -45,17 +45,17 @@ yarn add wikic
 
 ### Plugins
 
-A plugin is a `Function`, which receives a `context` (Object) and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
+A plugin is a `Function`, which receives a `context` and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
 
-A `context` passed to a plugin is an Object which contains some of the following properties:
+The `context` passed to a plugin is an `Object` which contains some of the following properties:
 
 - src: string, absolute path of source
 - dist: string, absolute path of destination
 - data: string, content of document
-- site: Object, site config
-- page: Object, page config
-- renderContext: Object, nunjucks render context, contains ['variables'](#variables-in-layouts)
-- IS_DOC: boolean, whether in docsPath
+- site: `Object`, site config
+- page: `Object`, page config
+- renderContext: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
+- IS_DOC: boolean, whether in `docsPath`
 
 Add a plugin by passing it to [`wikic.beforeWrite`](#wikicbeforewriteplugin) or [`wikic.afterRead`](#wikicafterreadplugin).
 
@@ -65,7 +65,7 @@ Default Config: [lib/defaultConfig.yml](lib/defaultConfig.yml)
 
 You can create `_config.yml`s to override defaultConfig.
 
-Here is an inheritance chain of configuration:
+Here are inheritance chains of configuration:
 
 - [lib/defaultConfig.yml](lib/defaultConfig.yml),  `_config.yml` (in `wikic.cwd`) => `wikic.config`
 - `wikic.config`, `_config.yml` (subdirectory of `wikic.cwd`, closest to markdown file) => `context.site`
@@ -90,16 +90,25 @@ hide: true # hide this page from docs list(necessary for the file in docsPath)
 
 ### Layouts
 
-You can create [Nunjucks](https://mozilla.github.io/nunjucks/templating.html) templates (extname is `.njk`) in `layoutPath` and set `page.layout` or `layout` in front matter to template's filename.
+You can create [Nunjucks](https://mozilla.github.io/nunjucks/templating.html) templates (extname is `.njk`) in `layoutPath`.
+
+In order to specify default layout for markdowns in a specific path, create a `_config.yml` in the path and add lines to it:
+
+``` yaml
+page:
+  layout: customLayout
+```
+
+Also, you can set `layout` in Front Matter for a specific markdown.
 
 #### Variables in Layouts
 
-- `site`, Object, reference to `context.site`
-- `page`, Object, reference to `context.page`
-    - `page.types`, Array, markdown's dirnames
+- `site`, `Object`, reference to `context.site`
+- `page`, `Object`, reference to `context.page`
+    - `page.types`, `Array`, markdown's dirnames
 - `content`, string, content of HTML built from markdown
 
-For markdown in 'docsPath'
+For markdowns in `docsPath`
 
 - `list`, string, list of documents in `docsPath`, See also [`wikic.setListTemplate(opts)`](#wikicsetlisttemplateopts)
 
@@ -107,13 +116,13 @@ For markdown in 'docsPath'
 
 - `typeMap`: see [`wikic.typeMap(key)`](#wikictypemapkey)
 - `baseurl`: see [`wikic.getURL(url)`](#wikicgeturlurl)
-- `typeMaps`: Receives a Array, Returns `array.map(typeMap)`. Tips: get typeNames array `{{ page.types | typeMaps }}`
+- `typeMaps`: Receives a `Array`, Returns `array.map(typeMap)`. Tips: get typeNames array `{{ page.types | typeMaps }}`
 
 #### Nunjucks in Markdown
 
 Variable `site` and `page` is available.
 
-`{{`, `}}`, `{#`, `#}`, `{%`, `%}` in raw blocks and `<code>` blocks can be escaped.
+`{{`, `}}`, `{#`, `#}`, `{%`, `%}` in raw blocks and `<code>` blocks will be escaped.
 
 ``` html
 <!-- markdown -->
@@ -151,7 +160,7 @@ const wikic = new Wikic('path/to')
 
 ### wikic.setup([cwd])
 
-- cwd: string, working dir, default value is `wikic.cwd || process.cwd()`
+- `cwd`: string, working dir, default value is `wikic.cwd || process.cwd()`
 - Returns: `this`
 
 Reloads configurations and layouts.
@@ -166,11 +175,11 @@ Cleans all the files in `publicPath`
 
 - Returns a `Promise`
 
-Builds both Files in `docsPath` and `root`
+Builds all the files in `docsPath` and `root`
 
 ### wikic.beforeWrite(plugin)
 
-- plugin: Function
+- `plugin`: `Function`
 - Returns `this`
 
 Pushes a plugin into task queue in which plugin will be invoked before writing each markdown file in order.
@@ -179,7 +188,7 @@ See [Plugins](#plugins)
 
 ### wikic.afterRead(plugin)
 
-- plugin: Function
+- `plugin`: `Function`
 - Returns `this`
 
 Pushes a plugin into task queue in which plugin will be executed after reading each markdown file in order.
@@ -194,21 +203,21 @@ Watches file change and run `wikic.build()` when changed
 
 - Returns `this`
 
-Serves the files in PublicPath
+Serves the files in `PublicPath`
 
 ### wikic.typeMap(key)
 
-- key: string
+- `key`: string
 - Returns typeName(a string) set in `wikic.config.typeMap`
 
 ### wikic.getURL(url)
 
-- url: string
+- `url`: string
 - Returns an absolute URL prefixed with base URL
 
 ### wikic.setListTemplate(opts)
 
-- opts: Object, contains document list templates
+- `opts`: `Object`, contains document list templates
 - Returns `this`
 
 See `defaultOptions` in [lib/utils/getList.js](lib/utils/getList.js)
