@@ -112,7 +112,7 @@ For markdowns in `docsPath`
 
 - `list`, string, list of documents in `docsPath`, See also [`wikic.setListTemplate(opts)`](#wikicsetlisttemplateopts)
 
-#### Builtin Filter
+#### Builtin Filters
 
 - `typeMap`: see [`wikic.typeMap(key)`](#wikictypemapkey)
 - `baseurl`: see [`wikic.getURL(url)`](#wikicgeturlurl)
