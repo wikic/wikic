@@ -54,20 +54,20 @@ A `context` passed to a plugin is an Object which contains some of the following
 - data: string, content of document
 - site: Object, site config
 - page: Object, page config
-- renderContext: Object, nunjucks render context, contains [`variables in layouts`](#variables-in-layouts)
+- renderContext: Object, nunjucks render context, contains ['variables'](#variables-in-layouts)
 - IS_DOC: boolean, whether in docsPath
 
 Add a plugin by passing it to [`wikic.beforeWrite`](#wikicbeforewriteplugin) or [`wikic.afterRead`](#wikicafterreadplugin).
 
 ### Configuration and Front Matter
 
-[Default Config](lib/defaultConfig.yml)
+Default Config: [lib/defaultConfig.yml](lib/defaultConfig.yml)
 
-You can create `_config.yml`(s) to override defaultConfig.
+You can create `_config.yml`s to override defaultConfig.
 
 Here is an inheritance chain of configuration:
 
-- 'defaultConfig',  `_config.yml` (in `wikic.cwd`) => `wikic.config`
+- [lib/defaultConfig.yml](lib/defaultConfig.yml),  `_config.yml` (in `wikic.cwd`) => `wikic.config`
 - `wikic.config`, `_config.yml` (subdirectory of `wikic.cwd`, closest to markdown file) => `context.site`
 - `context.page`, `context.site.page`, Front Matter in markdown => `context.page`
 
@@ -84,7 +84,7 @@ Front Matter example:
 title: Hello World # title of the page
 toc: false # disable toc for this page
 layout: docs # set layout for this page
-hide: true # hide this page from docs list(only necessary for the file in docsPath)
+hide: true # hide this page from docs list(necessary for the file in docsPath)
 ---
 ```
 
@@ -111,7 +111,7 @@ For markdown in 'docsPath'
 
 #### Nunjucks in Markdown
 
-Only variable `site` and `page` is available.
+Variable `site` and `page` is available.
 
 `{{`, `}}`, `{#`, `#}`, `{%`, `%}` in raw blocks and `<code>` blocks can be escaped.
 
@@ -211,7 +211,7 @@ Serves the files in PublicPath
 - opts: Object, contains document list templates
 - Returns `this`
 
-See defaultOptions in [lib/utils/getList.js](lib/utils/getList.js)
+See `defaultOptions` in [lib/utils/getList.js](lib/utils/getList.js)
 
 ## Thanks
 
