@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "a simple static site generator",
   "main": "lib/index.js",
   "author": "dgeibi",
@@ -19,6 +19,7 @@
     "find-parent-dir": "^0.3.0",
     "front-matter": "^2.1.2",
     "fs-promise": "^2.0.0",
+    "get-port": "^3.1.0",
     "glob": "^7.1.1",
     "highlight.js": "^9.10.0",
     "html-toc": "dgeibi/html-toc",
