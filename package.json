@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "a simple static site generator",
   "main": "lib/index.js",
   "author": "dgeibi",

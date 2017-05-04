@@ -116,6 +116,7 @@ For markdowns in `docsPath`
 
 - `typeMap`: see [`wikic.typeMap(key)`](#wikictypemapkey)
 - `baseurl`: see [`wikic.getURL(url)`](#wikicgeturlurl)
+- `relative`: Receives a absolute path string, returns a url relative to current page.
 - `typeMaps`: Receives a `Array`, Returns `array.map(typeMap)`. Tips: get typeNames array `{{ page.types | typeMaps }}`
 
 #### Nunjucks in Markdown
