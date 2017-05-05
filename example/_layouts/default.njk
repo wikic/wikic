@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+  <meta charset="UTF-8">
+  {% block title %}
+    <title>{{ page.title }}{{ " | " if page.title }}{{ site.title }}</title>
+  {% endblock %}
+  </head>
+  <body>
+    <div class="wrapper">
+    {% block body %}
+    {{ content | safe }}
+    {% endblock %}
+    </div>
+  </body>
+</html>

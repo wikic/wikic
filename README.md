@@ -14,6 +14,33 @@ a simple static site generator
 
 ## Usage
 
+### CLI
+
+#### `wikic build`
+
+Use `wikic build` to build pages.
+
+``` bash
+wikic build [options]
+#  Options:
+#
+#    -h, --help       output usage information
+#    -c, --clean      clean public dir before building
+#    -w, --watch      watch src dir change
+#    -s, --serve      serve public dir
+#    -d, --dir <dir>  change working dir
+```
+
+#### `wikic init`
+
+Use `wikic init` to create a new wikic folder
+
+``` bash
+wikic init <dir>
+```
+
+### Node module
+
 ``` javascript
 const htmlclean = require('htmlclean')
 const Wikic = require('wikic')

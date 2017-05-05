@@ -1,28 +1,33 @@
 {
   "name": "wikic",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "a simple static site generator",
   "main": "lib/index.js",
+  "bin": {
+    "wikic": "bin/wikic.js"
+  },
   "author": "dgeibi",
   "license": "MIT",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "format": "prettier-eslint --write './index.js' './lib/**/*.js' './__mocks__/**/*.js'",
+    "format": "prettier-eslint --write './lib/**/*.js' './__mocks__/**/*.js' './bin/**.js'",
     "test": "jest",
+    "build": "wikic build",
     "test:coverage": "jest --coverage",
     "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "bluebird": "^3.5.0",
     "chokidar": "^1.6.1",
+    "commander": "^2.9.0",
     "find-parent-dir": "^0.3.0",
     "front-matter": "^2.1.2",
     "fs-promise": "^2.0.0",
     "get-port": "^3.1.0",
     "glob": "^7.1.1",
     "highlight.js": "^9.10.0",
-    "html-toc": "dgeibi/html-toc",
+    "html-toc": "github:dgeibi/html-toc",
     "js-yaml": "^3.8.3",
     "lodash": "^4.17.4",
     "markdown-it": "^8.3.1",
@@ -49,5 +54,15 @@
   "bugs": {
     "url": "https://github.com/dgeibi/wikic/issues"
   },
-  "homepage": "https://github.com/dgeibi/wikic#readme"
+  "homepage": "https://github.com/dgeibi/wikic#readme",
+  "directories": {
+    "example": "example"
+  },
+  "keywords": [
+    "wikic",
+    "static",
+    "page",
+    "generator",
+    "markdown"
+  ]
 }
