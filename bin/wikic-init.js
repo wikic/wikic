@@ -1,5 +1,9 @@
 #! /usr/bin/env node
 
+/**
+ * xcatliu/pagic(MIT): https://github.com/xcatliu/pagic/tree/master/bin/pagic-init.js
+ */
+
 const path = require('path');
 const fsp = require('fs-promise');
 const program = require('commander');
@@ -24,7 +28,7 @@ if (fsp.existsSync(initDir)) {
   process.exit(1);
 }
 
-const copySrcDir = path.resolve(__dirname, '../site');
+const copySrcDir = path.resolve(__dirname, '../example');
 initDir = path.resolve(initDir);
 fsp.copySync(copySrcDir, initDir);
 
