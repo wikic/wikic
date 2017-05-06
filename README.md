@@ -196,13 +196,13 @@ Variable `site` and `page` is available.
 Creates a Wikic
 
 ``` javascript
-const wikic = new Wikic()
+const wikic = new Wikic();
 ```
 
 You can pass a string to set `wikic.cwd`.
 
 ``` javascript
-const wikic = new Wikic('path/to')
+const wikic = new Wikic('path/to');
 ```
 
 ### wikic.setup([cwd])
@@ -245,7 +245,7 @@ Watches file change and run `wikic.build()` when changed
 
 ### wikic.serve()
 
-- Returns `this`
+- Returns a `Promise`
 
 Serves the files in `PublicPath`
 
