@@ -42,20 +42,23 @@ wikic init <dir>
 ### Node module
 
 ``` javascript
-const htmlclean = require('htmlclean')
-const Wikic = require('wikic')
+const htmlclean = require('htmlclean');
+const Wikic = require('wikic');
 
-const wikic = new Wikic()
+const wikic = new Wikic();
 
 // add plugin to minify html before write
-wikic.beforeWrite(function minify(context) {
+wikic.addPlugin('beforeWrite', function minify(context) {
   if (!context.data) return context
   const html = htmlclean(context.data)
   return Object.assign({}, context, { data: html })
-})
+});
 
 // build the site and start watcher and server to debug or preview
-wikic.build().then(() => wikic.watch().serve())
+wikic
+  .build()
+  .then(() => wikic.watch())
+  .then(() => wikic.serve());
 ```
 
 ## Getting started
@@ -84,7 +87,23 @@ The `context` passed to a plugin is an `Object` which contains some of the follo
 - renderContext: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
 - IS_DOC: boolean, whether in `docsPath`
 
-Add a plugin by passing it to [`wikic.beforeWrite`](#wikicbeforewriteplugin) or [`wikic.afterRead`](#wikicafterreadplugin).
+Use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins or write a `_plugins.js` in root of wikic folder:
+
+``` javascript
+const htmlclean = require('htmlclean');
+
+exports.beforeWritePlugins = [
+  (context) => {
+    if (!context.data) return context;
+    const html = htmlclean(context.data);
+    return Object.assign({}, context, { data: html });
+  },
+];
+
+exports.afterReadPlugins = [
+  //...
+];
+```
 
 ### Configuration and Front Matter
 
@@ -205,21 +224,18 @@ Cleans all the files in `publicPath`
 
 Builds all the files in `docsPath` and `root`
 
-### wikic.beforeWrite(plugin)
+### wikic.addPlugin(key, plugin)
 
+- `key`: string, type of plugin
 - `plugin`: `Function`
 - Returns `this`
 
-Pushes a plugin into task queue in which plugin will be invoked before writing each markdown file in order.
+Type of plugin:
+
+- 'afterRead': executed after reading each markdown file in order.
+- 'beforeWrite': invoked before writing each markdown file in order.
 
 See [Plugins](#plugins)
-
-### wikic.afterRead(plugin)
-
-- `plugin`: `Function`
-- Returns `this`
-
-Pushes a plugin into task queue in which plugin will be executed after reading each markdown file in order.
 
 ### wikic.watch()
 
@@ -245,10 +261,27 @@ Serves the files in `PublicPath`
 
 ### wikic.setListTemplate(opts)
 
-- `opts`: `Object`, contains document list templates
+- `opts`: `Object` | `null`, contains document list templates
 - Returns `this`
 
 See `defaultOptions` in [lib/utils/getList.js](lib/utils/getList.js)
+
+You can also setListTemplate via `_plugins.js`:
+
+``` javascript
+exports.listTemplate = {
+    headerTemplate(
+    {
+      level,
+      index,
+      typeName,
+      typeID,
+    }
+  ) {
+    return `<label for="${level}-${index}">${typeName}</label><input type="checkbox" id="${level}-${index}" data-type="${typeID}">`;
+  },
+};
+```
 
 ## Thanks
 
