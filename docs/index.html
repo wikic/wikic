@@ -12,7 +12,7 @@
         <h1>Wikic</h1>
 <p><a href="https://travis-ci.org/dgeibi/wikic"><img src="https://travis-ci.org/dgeibi/wikic.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/dgeibi/wikic"><img src="https://img.shields.io/coveralls/dgeibi/wikic.svg" alt="Coveralls"></a>
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
+<a href="https://github.com/dgeibi/wikic/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
 <a href="https://www.npmjs.com/package/wikic"><img src="https://img.shields.io/npm/v/wikic.svg" alt="version"></a>
 <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D%207.0.0-brightgreen.svg" alt="Node"></a></p>
 <p>a simple static site generator</p>
@@ -100,11 +100,11 @@ npm install -g wikic
 npm install --save wikic
 </code></pre>
 <h3 id="configuration-and-front-matter">Configuration and Front Matter<a class="anchor" href="#configuration-and-front-matter"></a></h3>
-<p>Default Config: <a href="lib/defaultConfig.yml">lib/defaultConfig.yml</a></p>
+<p>Default Config: <a href="https://github.com/dgeibi/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a></p>
 <p>You can create <code>_config.yml</code>s to override defaultConfig.</p>
 <p>Here are inheritance chains of configuration:</p>
 <ul>
-<li><a href="lib/defaultConfig.yml">lib/defaultConfig.yml</a>,  <code>_config.yml</code> (in <code>wikic.cwd</code>) =&gt; <code>wikic.config</code></li>
+<li><a href="https://github.com/dgeibi/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a>,  <code>_config.yml</code> (in <code>wikic.cwd</code>) =&gt; <code>wikic.config</code></li>
 <li><code>wikic.config</code>, <code>_config.yml</code> (subdirectory of <code>wikic.cwd</code>, closest to markdown file) =&gt; <code>context.site</code></li>
 <li><code>context.page</code>, <code>context.site.page</code>, Front Matter in markdown =&gt; <code>context.page</code></li>
 </ul>
@@ -252,7 +252,7 @@ exports.afterReadPlugins = [
 <li><code>opts</code>: <code>Object</code> | <code>null</code>, contains document list templates</li>
 <li>Returns <code>this</code></li>
 </ul>
-<p>See <code>defaultOptions</code> in <a href="lib/utils/getList.js">lib/utils/getList.js</a></p>
+<p>See <code>defaultOptions</code> in <a href="https://github.com/dgeibi/wikic/blob/master/lib/utils/getList.js">lib/utils/getList.js</a></p>
 <p>You can also setListTemplate via <code>_plugins.js</code>:</p>
 <pre class="hljs"><code>exports.listTemplate = {
     headerTemplate(
@@ -276,7 +276,7 @@ exports.afterReadPlugins = [
 <li>...</li>
 </ul>
 <h2 id="license">LICENSE<a class="anchor" href="#license"></a></h2>
-<p><a href="LICENSE">MIT</a></p>
+<p><a href="https://github.com/dgeibi/wikic/blob/master/LICENSE">MIT</a></p>
 
         </div>
   </body>

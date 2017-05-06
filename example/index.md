@@ -101,13 +101,13 @@ npm install --save wikic
 
 ### Configuration and Front Matter
 
-Default Config: [lib/defaultConfig.yml](lib/defaultConfig.yml)
+Default Config: [lib/defaultConfig.yml][default-config]
 
 You can create `_config.yml`s to override defaultConfig.
 
 Here are inheritance chains of configuration:
 
-- [lib/defaultConfig.yml](lib/defaultConfig.yml),  `_config.yml` (in `wikic.cwd`) => `wikic.config`
+- [lib/defaultConfig.yml][default-config],  `_config.yml` (in `wikic.cwd`) => `wikic.config`
 - `wikic.config`, `_config.yml` (subdirectory of `wikic.cwd`, closest to markdown file) => `context.site`
 - `context.page`, `context.site.page`, Front Matter in markdown => `context.page`
 
@@ -290,7 +290,7 @@ Serves the files in `PublicPath`
 - `opts`: `Object` | `null`, contains document list templates
 - Returns `this`
 
-See `defaultOptions` in [lib/utils/getList.js](lib/utils/getList.js)
+See `defaultOptions` in [lib/utils/getList.js](https://github.com/dgeibi/wikic/blob/master/lib/utils/getList.js)
 
 You can also setListTemplate via `_plugins.js`:
 
@@ -321,7 +321,8 @@ exports.listTemplate = {
 
 [MIT][license]
 
-[license]: LICENSE
+[default-config]: https://github.com/dgeibi/wikic/blob/master/lib/defaultConfig.yml
+[license]: https://github.com/dgeibi/wikic/blob/master/LICENSE
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [coverage]: https://coveralls.io/github/dgeibi/wikic
 [coverage-badge]: https://img.shields.io/coveralls/dgeibi/wikic.svg
