@@ -49,9 +49,9 @@ const wikic = new Wikic();
 
 // add plugin to minify html before write
 wikic.addPlugin('beforeWrite', function minify(context) {
-  if (!context.data) return context
-  const html = htmlclean(context.data)
-  return Object.assign({}, context, { data: html })
+  if (!context.data) return context;
+  const html = htmlclean(context.data);
+  return Object.assign({}, context, { data: html });
 });
 
 // build the site and start watcher and server to debug or preview
@@ -278,7 +278,8 @@ exports.listTemplate = {
       typeID,
     }
   ) {
-    return `<label for="${level}-${index}">${typeName}</label><input type="checkbox" id="${level}-${index}" data-type="${typeID}">`;
+    return `<label for="${level}-${index}">${typeName}</label>
+<input type="checkbox" id="${level}-${index}" data-type="${typeID}">`;
   },
 };
 ```
