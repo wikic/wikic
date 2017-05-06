@@ -275,11 +275,11 @@ exports.listTemplate = {
       level,
       index,
       typeName,
-      typeID,
+      typeSlug,
     }
   ) {
     return `<label for="${level}-${index}">${typeName}</label>
-<input type="checkbox" id="${level}-${index}" data-type="${typeID}">`;
+<input type="checkbox" id="${level}-${index}" data-type="${typeSlug}">`;
   },
 };
 ```
