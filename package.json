@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "a simple static site generator",
   "main": "lib/index.js",
   "bin": {
@@ -23,7 +23,7 @@
     "commander": "^2.9.0",
     "find-parent-dir": "^0.3.0",
     "front-matter": "^2.1.2",
-    "fs-promise": "^2.0.0",
+    "fs-extra": "^3.0.1",
     "get-port": "^3.1.0",
     "glob": "^7.1.1",
     "highlight.js": "^9.10.0",
@@ -60,6 +60,7 @@
   },
   "keywords": [
     "wikic",
+    "wiki",
     "static",
     "page",
     "generator",

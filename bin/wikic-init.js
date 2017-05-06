@@ -5,7 +5,7 @@
  */
 
 const path = require('path');
-const fsp = require('fs-promise');
+const fse = require('fs-extra');
 const program = require('commander');
 const logger = require('../lib/utils/log');
 
@@ -23,14 +23,14 @@ if (typeof initDir === 'undefined') {
   process.exit(1);
 }
 
-if (fsp.existsSync(initDir)) {
+if (fse.existsSync(initDir)) {
   logger.error(`${initDir} already exists`);
   process.exit(1);
 }
 
 const copySrcDir = path.resolve(__dirname, '../example');
 initDir = path.resolve(initDir);
-fsp.copySync(copySrcDir, initDir);
+fse.copySync(copySrcDir, initDir);
 
 logger.verbose(
   `Init ${initDir} done
