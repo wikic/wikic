@@ -1,9 +1,5 @@
-title: Wikic Example
-baseurl:
-port: 4000
-publicPath: docs
-excludes:
-typeMap:
-page:
-  layout: default
-  toc: false
+title: Wikic
+baseurl: wikic
+publicPath: ../docs
+toc:
+  selectors: 'h2, h3, h4'

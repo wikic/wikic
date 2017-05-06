@@ -1,0 +1,95 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-size: 16px;
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
+    line-height: 1.5;
+    margin: 10px 13px 10px 13px;
+}
+
+a {
+    color: #4078C0;
+    text-decoration: none;
+}
+a img {
+    border: none;
+}
+
+p {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+h1, h2, h3, h4, h5 {
+  margin-bottom: .4em;
+}
+
+h1 {
+    font-size: 2.25rem;
+}
+
+h2 {
+    font-size: 1.7rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.3rem;
+}
+
+h5 {
+    font-size: 1.2rem;
+}
+
+ul, ol {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+li:not(:last-of-type) {
+    margin-bottom: 2px;
+}
+
+pre, code {
+  background: #f8f8f8;
+}
+
+
+code {
+  padding: 1px 5px;
+}
+
+pre {
+  padding: 8px 12px;
+  overflow-x: auto;
+}
+
+pre > code {
+  border: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+@media screen and (min-width: 768px) {
+    body {
+        width: 748px;
+        margin:10px auto;
+    }
+}
+
+h2:hover .anchor::after,h3:hover .anchor::after,h4:hover .anchor::after {
+  content: ' #';
+}

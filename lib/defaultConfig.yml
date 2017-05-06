@@ -27,6 +27,14 @@ excludes: []
 typeMap: {}
 # map from dirname to typeName
 
+toc:
+  selectors: 'h1, h2'
+  minLength: 0
+  # min length of headings to create toc
+  header: ''
+  id: '#toc'
+  # selector of toc container
+
 page:
 # default page config
   layout: default

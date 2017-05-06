@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "a simple static site generator",
   "main": "lib/index.js",
   "bin": {
@@ -13,7 +13,7 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier-eslint --write './lib/**/*.js' './__mocks__/**/*.js' './bin/**.js'",
     "test": "jest",
-    "build": "wikic build",
+    "build": "cp README.md example/index.md && ./bin/wikic.js build -d example",
     "test:coverage": "jest --coverage",
     "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
   },

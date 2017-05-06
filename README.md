@@ -8,6 +8,32 @@
 
 a simple static site generator
 
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Example](#example)
+- [Usage](#usage)
+    - [CLI](#cli)
+    - [Node module](#node-module)
+- [Getting started](#getting-started)
+    - [Installation](#installation)
+    - [Configuration and Front Matter](#configuration-and-front-matter)
+    - [Layouts](#layouts)
+    - [Plugins](#plugins)
+- [API](#api)
+    - [Wikic([cwd])](#wikiccwd)
+    - [wikic.setup([cwd])](#wikicsetupcwd)
+    - [wikic.clean()](#wikicclean)
+    - [wikic.build()](#wikicbuild)
+    - [wikic.addPlugin(key, plugin)](#wikicaddpluginkey-plugin)
+    - [wikic.watch()](#wikicwatch)
+    - [wikic.serve()](#wikicserve)
+    - [wikic.typeMap(key)](#wikictypemapkey)
+    - [wikic.getURL(url)](#wikicgeturlurl)
+    - [wikic.setListTemplate(opts)](#wikicsetlisttemplateopts)
+- [Thanks](#thanks)
+- [LICENSE](#license)
+
 ## Example
 
 - [dgeibi/note](https://github.com/dgeibi/note)
@@ -15,6 +41,14 @@ a simple static site generator
 ## Usage
 
 ### CLI
+
+#### `wikic init`
+
+Use `wikic init` to create a new wikic folder
+
+``` bash
+wikic init <dir>
+```
 
 #### `wikic build`
 
@@ -29,14 +63,6 @@ wikic build [options]
 #    -w, --watch      watch src dir change
 #    -s, --serve      serve public dir
 #    -d, --dir <dir>  change working dir
-```
-
-#### `wikic init`
-
-Use `wikic init` to create a new wikic folder
-
-``` bash
-wikic init <dir>
 ```
 
 ### Node module
@@ -66,43 +92,11 @@ wikic
 ### Installation
 
 ``` bash
+# install as a cli tool
+npm install -g wikic
+
+# install as a node dependency
 npm install --save wikic
-
-#or
-
-yarn add wikic
-```
-
-### Plugins
-
-A plugin is a `Function`, which receives a `context` and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
-
-The `context` passed to a plugin is an `Object` which contains some of the following properties:
-
-- src: string, absolute path of source
-- dist: string, absolute path of destination
-- data: string, content of document
-- site: `Object`, site config
-- page: `Object`, page config
-- renderContext: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
-- IS_DOC: boolean, whether in `docsPath`
-
-Use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins or write a `_plugins.js` in root of wikic folder:
-
-``` javascript
-const htmlclean = require('htmlclean');
-
-exports.beforeWritePlugins = [
-  (context) => {
-    if (!context.data) return context;
-    const html = htmlclean(context.data);
-    return Object.assign({}, context, { data: html });
-  },
-];
-
-exports.afterReadPlugins = [
-  //...
-];
 ```
 
 ### Configuration and Front Matter
@@ -187,6 +181,38 @@ Variable `site` and `page` is available.
 
 <!-- output -->
 <code>{{ page.title }}</code>
+```
+
+### Plugins
+
+A plugin is a `Function`, which receives a `context` and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
+
+The `context` passed to a plugin is an `Object` which contains some of the following properties:
+
+- src: string, absolute path of source
+- dist: string, absolute path of destination
+- data: string, content of document
+- site: `Object`, site config
+- page: `Object`, page config
+- renderContext: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
+- IS_DOC: boolean, whether in `docsPath`
+
+Use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins or write a `_plugins.js` in root of wikic folder:
+
+``` javascript
+const htmlclean = require('htmlclean');
+
+exports.beforeWritePlugins = [
+  (context) => {
+    if (!context.data) return context;
+    const html = htmlclean(context.data);
+    return Object.assign({}, context, { data: html });
+  },
+];
+
+exports.afterReadPlugins = [
+  //...
+];
 ```
 
 ## API
