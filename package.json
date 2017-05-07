@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "a simple static site generator",
   "main": "lib/index.js",
   "bin": {
@@ -27,11 +27,11 @@
     "get-port": "^3.1.0",
     "glob": "^7.1.1",
     "highlight.js": "^9.10.0",
-    "html-toc": "github:dgeibi/html-toc",
     "js-yaml": "^3.8.3",
     "lodash": "^4.17.4",
     "markdown-it": "^8.3.1",
     "nunjucks": "^3.0.0",
+    "wikic-html-toc": "^1.0.5",
     "winston": "^2.3.1"
   },
   "devDependencies": {

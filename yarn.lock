@@ -1397,15 +1397,6 @@ html-encoding-sniffer@^1.0.1:
   dependencies:
     whatwg-encoding "^1.0.1"
 
-"html-toc@github:dgeibi/html-toc":
-  version "1.0.5"
-  resolved "https://codeload.github.com/dgeibi/html-toc/tar.gz/8279cb13f2cff4d14b4f373fdb48ff0c3f13a618"
-  dependencies:
-    cheerio "^0.22.0"
-    escape-html "^1.0.3"
-    extend-shallow "^2.0.1"
-    markdown-slug "^0.1.1"
-
 htmlparser2@^3.9.1:
   version "3.9.2"
   resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-3.9.2.tgz#1bdf87acca0f3f9e53fa4fcceb0f4b4cbb00b338"
@@ -3212,6 +3203,15 @@ wide-align@^1.1.0:
   resolved "https://registry.yarnpkg.com/wide-align/-/wide-align-1.1.0.tgz#40edde802a71fea1f070da3e62dcda2e7add96ad"
   dependencies:
     string-width "^1.0.1"
+
+wikic-html-toc@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/wikic-html-toc/-/wikic-html-toc-1.0.5.tgz#54bdf961f23bf6799f20ddf51f62c14cb280e976"
+  dependencies:
+    cheerio "^0.22.0"
+    escape-html "^1.0.3"
+    extend-shallow "^2.0.1"
+    markdown-slug "^0.1.1"
 
 window-size@0.1.0:
   version "0.1.0"
