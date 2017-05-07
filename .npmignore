@@ -6,7 +6,6 @@ __tests__
 .eslintignore
 
 /example/_plugins.js
-/example/_config.yml
 
 # Logs
 logs
