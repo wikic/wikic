@@ -29,11 +29,9 @@ if (fse.existsSync(initDir)) {
 }
 
 const copySrcDir = path.resolve(__dirname, '../example');
-const defaultConfigPath = path.resolve(__dirname, '../lib/defaultConfig.yml');
 
 initDir = path.resolve(initDir);
 fse.copySync(copySrcDir, initDir);
-fse.copySync(defaultConfigPath, path.resolve(initDir, '_config.yml'));
 
 logger.verbose(
   `Init ${initDir} done

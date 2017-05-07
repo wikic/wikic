@@ -1,5 +1,3 @@
 title: Wikic
-baseurl: wikic
-publicPath: ../docs
 toc:
   selectors: 'h2, h3, h4'
