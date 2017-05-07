@@ -58,11 +58,13 @@ Use `wikic build` to build pages.
 wikic build [options]
 #  Options:
 #
-#    -h, --help       output usage information
-#    -c, --clean      clean public dir before building
-#    -w, --watch      watch src dir change
-#    -s, --serve      serve public dir
-#    -d, --dir <dir>  change working dir
+#    -h, --help           output usage information
+#    -c, --clean          clean public dir before building
+#    -w, --watch          watch src dir change
+#    -s, --serve          serve public dir
+#    -d, --dir <dir>      change working dir
+#    -o, --output <dir>   change public dir
+#    -p, --port <number>  change server port
 ```
 
 ### Node module
@@ -217,23 +219,21 @@ exports.afterReadPlugins = [
 
 ## API
 
-### Wikic([cwd])
+### Wikic([cwd, [config]])
 
-Creates a Wikic
+- `cwd`: string, working dir, default value is `process.cwd()`
+- `config`: `Object`, overwrite config loaded from root directory's `_config.yml`
 
-``` javascript
-const wikic = new Wikic();
-```
-
-You can pass a string to set `wikic.cwd`.
+Create a `Wikic`. Set working directory to `path/to` and set server's port to `1234`:
 
 ``` javascript
-const wikic = new Wikic('path/to');
+const wikic = new Wikic('path/to', { port: 1234 });
 ```
 
-### wikic.setup([cwd])
+### wikic.setup([cwd, [config]])
 
-- `cwd`: string, working dir, default value is `wikic.cwd || process.cwd()`
+- `cwd`: string, working dir, default value is `process.cwd()`
+- `config`: `Object`, overwrite content of root directory's `_config.yml`
 - Returns: `this`
 
 Reloads configurations and layouts.
