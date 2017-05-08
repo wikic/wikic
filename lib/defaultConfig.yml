@@ -28,10 +28,13 @@ typeMap: {}
 # map from dirname to typeName
 
 toc:
+  # https://github.com/jonschlinkert/html-toc
   selectors: 'h1, h2'
   minLength: 0
   # min length of headings to create toc
   header: ''
+  addID: true
+  parentLink: false
   id: '#toc'
   # selector of toc container
 
@@ -41,3 +44,8 @@ page:
   # default layout name
   toc: true
   # enable/disable table of content
+
+logger:
+  # https://github.com/winstonjs/winston#logging-levels
+  file: verbose
+  console: verbose
