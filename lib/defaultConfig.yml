@@ -34,10 +34,10 @@ page:
   toc: true
   # enable/disable table of content
 
-# logger:
-#   # https://github.com/winstonjs/winston#logging-levels
-#   file: verbose
-#   console: verbose
+logger:
+# https://github.com/winstonjs/winston#logging-levels
+  file: verbose
+  console: verbose
 
 # toc:
 #   # See https://github.com/jonschlinkert/html-toc#options
