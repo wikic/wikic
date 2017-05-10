@@ -5,8 +5,6 @@ __tests__
 .eslintrc
 .eslintignore
 
-/example/_plugins.js
-
 # Logs
 logs
 *.log
