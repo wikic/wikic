@@ -66,11 +66,13 @@
 <pre class="hljs"><code>wikic build [options]
 <span class="hljs-comment">#  Options:</span>
 <span class="hljs-comment">#</span>
-<span class="hljs-comment">#    -h, --help       output usage information</span>
-<span class="hljs-comment">#    -c, --clean      clean public dir before building</span>
-<span class="hljs-comment">#    -w, --watch      watch src dir change</span>
-<span class="hljs-comment">#    -s, --serve      serve public dir</span>
-<span class="hljs-comment">#    -d, --dir &lt;dir&gt;  change working dir</span>
+<span class="hljs-comment">#    -h, --help           output usage information</span>
+<span class="hljs-comment">#    -c, --clean          clean public dir before building</span>
+<span class="hljs-comment">#    -w, --watch          watch src dir change</span>
+<span class="hljs-comment">#    -s, --serve          serve public dir</span>
+<span class="hljs-comment">#    -d, --dir &lt;dir&gt;      change working dir</span>
+<span class="hljs-comment">#    -o, --output &lt;dir&gt;   change public dir</span>
+<span class="hljs-comment">#    -p, --port &lt;number&gt;  change server port</span>
 </code></pre>
 <h3 id="node-module">Node module<a class="anchor" href="#node-module"></a></h3>
 <pre class="hljs"><code><span class="hljs-keyword">const</span> htmlclean = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;htmlclean&apos;</span>);
@@ -101,17 +103,26 @@ npm install --save wikic
 </code></pre>
 <h3 id="configuration-and-front-matter">Configuration and Front Matter<a class="anchor" href="#configuration-and-front-matter"></a></h3>
 <p>Default Config: <a href="https://github.com/dgeibi/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a></p>
-<p>You can create <code>_config.yml</code>s to override defaultConfig.</p>
+<p>You can create <code>_config.yml</code>s or a <code>wikic.config.js</code> to override defaultConfig.</p>
 <p>Here are inheritance chains of configuration:</p>
 <ul>
-<li><a href="https://github.com/dgeibi/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a>,  <code>_config.yml</code> (in <code>wikic.cwd</code>) =&gt; <code>wikic.config</code></li>
+<li><a href="https://github.com/dgeibi/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a>, <code>_config.yml</code> and <code>wikic.config.js</code> (in <code>wikic.cwd</code>) =&gt; <code>wikic.config</code></li>
 <li><code>wikic.config</code>, <code>_config.yml</code> (subdirectory of <code>wikic.cwd</code>, closest to markdown file) =&gt; <code>context.site</code></li>
 <li><code>context.page</code>, <code>context.site.page</code>, Front Matter in markdown =&gt; <code>context.page</code></li>
 </ul>
-<p>The <code>_config.yml</code> in <code>wikic.cwd</code> will be loaded as <code>wikic.config</code>.</p>
+<p>The <code>_config.yml</code> and <code>wikic.config.js</code> in <code>wikic.cwd</code> will be loaded as <code>wikic.config</code>.</p>
 <p>The <code>_config.yml</code> closest to markdown will be merged into <code>context.site</code> (global config which is passed to plugins).</p>
 <p>Front Matter in each markdown will be merged into <code>context.page</code> (page config which is passed to plugins) respectively.</p>
-<p>Front Matter example:</p>
+<p><strong>Note</strong>: In <code>wikic.cwd</code>, <code>wikic.config.js</code> &gt; <code>_config.yml</code></p>
+<p><strong><code>wikic.config.js</code> Example</strong>:</p>
+<pre class="hljs"><code><span class="hljs-built_in">module</span>.exports = {
+  <span class="hljs-attr">title</span>: <span class="hljs-string">&apos;Wikic&apos;</span>,
+  <span class="hljs-attr">toc</span>: {
+    <span class="hljs-attr">selectors</span>: <span class="hljs-string">&apos;h2, h3, h4&apos;</span>,
+  },
+};
+</code></pre>
+<p><strong>Front Matter example</strong>:</p>
 <pre class="hljs"><code><span class="hljs-meta">---</span>
 <span class="hljs-attr">title:</span> <span class="hljs-string">Hello</span> <span class="hljs-string">World</span> <span class="hljs-comment"># title of the page</span>
 <span class="hljs-attr">toc:</span> <span class="hljs-literal">false</span> <span class="hljs-comment"># disable toc for this page</span>
@@ -176,32 +187,35 @@ npm install --save wikic
 <li>renderContext: <code>Object</code>, nunjucks render context, contains <a href="#variables-in-layouts">variables</a></li>
 <li>IS_DOC: boolean, whether in <code>docsPath</code></li>
 </ul>
-<p>Use <a href="#wikicaddpluginkey-plugin"><code>wikic.addPlugin</code></a> to add plugins or write a <code>_plugins.js</code> in root of wikic folder:</p>
+<p>Use <a href="#wikicaddpluginkey-plugin"><code>wikic.addPlugin</code></a> to add plugins or use <code>wikic.config.js</code>:</p>
 <pre class="hljs"><code><span class="hljs-keyword">const</span> htmlclean = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;htmlclean&apos;</span>);
 
-exports.beforeWritePlugins = [
-  <span class="hljs-function">(<span class="hljs-params">context</span>) =&gt;</span> {
-    <span class="hljs-keyword">if</span> (!context.data) <span class="hljs-keyword">return</span> context;
-    <span class="hljs-keyword">const</span> html = htmlclean(context.data);
-    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.assign({}, context, { <span class="hljs-attr">data</span>: html });
-  },
-];
-
-exports.afterReadPlugins = [
-  <span class="hljs-comment">//...</span>
-];
+<span class="hljs-built_in">module</span>.exports = {
+  <span class="hljs-attr">beforeWritePlugins</span>: [
+    <span class="hljs-function">(<span class="hljs-params">context</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (!context.data) <span class="hljs-keyword">return</span> context;
+        <span class="hljs-keyword">const</span> html = htmlclean(context.data);
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.assign({}, context, { <span class="hljs-attr">data</span>: html });
+    },
+  ],
+  <span class="hljs-attr">afterReadPlugins</span>: [
+    <span class="hljs-comment">//...</span>
+  ]
+};
 </code></pre>
 <h2 id="api">API<a class="anchor" href="#api"></a></h2>
-<h3 id="wikiccwd">Wikic([cwd])<a class="anchor" href="#wikiccwd"></a></h3>
-<p>Creates a Wikic</p>
-<pre class="hljs"><code><span class="hljs-keyword">const</span> wikic = <span class="hljs-keyword">new</span> Wikic();
-</code></pre>
-<p>You can pass a string to set <code>wikic.cwd</code>.</p>
-<pre class="hljs"><code><span class="hljs-keyword">const</span> wikic = <span class="hljs-keyword">new</span> Wikic(<span class="hljs-string">&apos;path/to&apos;</span>);
-</code></pre>
-<h3 id="wikicsetupcwd">wikic.setup([cwd])<a class="anchor" href="#wikicsetupcwd"></a></h3>
+<h3 id="wikiccwd-config">Wikic([cwd, [config]])<a class="anchor" href="#wikiccwd-config"></a></h3>
 <ul>
-<li><code>cwd</code>: string, working dir, default value is <code>wikic.cwd || process.cwd()</code></li>
+<li><code>cwd</code>: string, working dir, default value is <code>process.cwd()</code></li>
+<li><code>config</code>: <code>Object</code>, overwrite config loaded from <code>cwd</code>&apos;s <code>_config.yml</code> and <code>wikic.config.js</code></li>
+</ul>
+<p>Create a <code>Wikic</code>. Set working directory to <code>path/to</code> and set server&apos;s port to <code>1234</code>:</p>
+<pre class="hljs"><code><span class="hljs-keyword">const</span> wikic = <span class="hljs-keyword">new</span> Wikic(<span class="hljs-string">&apos;path/to&apos;</span>, { <span class="hljs-attr">port</span>: <span class="hljs-number">1234</span> });
+</code></pre>
+<h3 id="wikicsetupcwd-config">wikic.setup([cwd, [config]])<a class="anchor" href="#wikicsetupcwd-config"></a></h3>
+<ul>
+<li><code>cwd</code>: string, working dir, default value is <code>process.cwd()</code></li>
+<li><code>config</code>: <code>Object</code>, overwrite content of <code>cwd</code>&apos;s <code>_config.yml</code> and <code>wikic.config.js</code></li>
 <li>Returns: <code>this</code></li>
 </ul>
 <p>Reloads configurations and layouts.</p>
@@ -253,19 +267,17 @@ exports.afterReadPlugins = [
 <li>Returns <code>this</code></li>
 </ul>
 <p>See <code>defaultOptions</code> in <a href="https://github.com/dgeibi/wikic/blob/master/lib/utils/getList.js">lib/utils/getList.js</a></p>
-<p>You can also setListTemplate via <code>_plugins.js</code>:</p>
-<pre class="hljs"><code>exports.listTemplate = {
-    headerTemplate(
-    {
+<p>You can also set list template via <code>wikic.config.js</code>:</p>
+<pre class="hljs"><code><span class="hljs-built_in">module</span>.exports = {
+  <span class="hljs-attr">listTemplate</span>: {
+    <span class="hljs-attr">headerTemplate</span>: ({
       level,
       index,
       typeName,
       typeSlug,
-    }
-  ) {
-    <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;label for=&quot;<span class="hljs-subst">${level}</span>-<span class="hljs-subst">${index}</span>&quot;&gt;<span class="hljs-subst">${typeName}</span>&lt;/label&gt;
-&lt;input type=&quot;checkbox&quot; id=&quot;<span class="hljs-subst">${level}</span>-<span class="hljs-subst">${index}</span>&quot; data-type=&quot;<span class="hljs-subst">${typeSlug}</span>&quot;&gt;`</span>;
-  },
+    }) =&gt; <span class="hljs-string">`&lt;label for=&quot;<span class="hljs-subst">${level}</span>-<span class="hljs-subst">${index}</span>&quot;&gt;<span class="hljs-subst">${typeName}</span>&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; id=&quot;<span class="hljs-subst">${level}</span>-<span class="hljs-subst">${index}</span>&quot; data-type=&quot;<span class="hljs-subst">${typeSlug}</span>&quot;&gt;`</span>,
+  }
 };
 </code></pre>
 <h2 id="thanks">Thanks<a class="anchor" href="#thanks"></a></h2>

@@ -27,17 +27,6 @@ excludes: []
 typeMap: {}
 # map from dirname to typeName
 
-toc:
-  # https://github.com/jonschlinkert/html-toc
-  selectors: 'h1, h2'
-  minLength: 0
-  # min length of headings to create toc
-  header: ''
-  addID: true
-  parentLink: false
-  id: '#toc'
-  # selector of toc container
-
 page:
 # default page config
   layout: default
@@ -45,7 +34,39 @@ page:
   toc: true
   # enable/disable table of content
 
-logger:
-  # https://github.com/winstonjs/winston#logging-levels
-  file: verbose
-  console: verbose
+# logger:
+#   # https://github.com/winstonjs/winston#logging-levels
+#   file: verbose
+#   console: verbose
+
+# toc:
+#   # See https://github.com/jonschlinkert/html-toc#options
+#   selectors: 'h1, h2'
+#
+#   minLength: 0
+#   # min length of headings to create toc
+#
+#   addID: true
+#   parentLink: false
+#
+#   id: '#toc'
+#   # selector of toc container
+#
+#   # Following options are available in `wikic.config.js` but not in `_config.yml`
+#   # because JavaScript's function is not available in YAML.
+#   slugger: # Function
+#   anchorTemplate: # Function
+
+# markdownIt:
+# # See https://github.com/markdown-it/markdown-it#init-with-presets-and-options
+# # See lib/plugins/mdFilter.js
+#   html: true
+#   linkify: true
+#   typography: true
+#   highlight: # Function, use highlight.js
+
+# beforeWritePlugins: [] # Array<Function>
+# afterReadPlugins: [] # Array<Function>
+
+# listTemplate: # Object
+# # See lib/utils/getList.js

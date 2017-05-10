@@ -58,11 +58,13 @@ Use `wikic build` to build pages.
 wikic build [options]
 #  Options:
 #
-#    -h, --help       output usage information
-#    -c, --clean      clean public dir before building
-#    -w, --watch      watch src dir change
-#    -s, --serve      serve public dir
-#    -d, --dir <dir>  change working dir
+#    -h, --help           output usage information
+#    -c, --clean          clean public dir before building
+#    -w, --watch          watch src dir change
+#    -s, --serve          serve public dir
+#    -d, --dir <dir>      change working dir
+#    -o, --output <dir>   change public dir
+#    -p, --port <number>  change server port
 ```
 
 ### Node module
@@ -103,21 +105,34 @@ npm install --save wikic
 
 Default Config: [lib/defaultConfig.yml][default-config]
 
-You can create `_config.yml`s to override defaultConfig.
+You can create `_config.yml`s or a `wikic.config.js` to override defaultConfig.
 
 Here are inheritance chains of configuration:
 
-- [lib/defaultConfig.yml][default-config],  `_config.yml` (in `wikic.cwd`) => `wikic.config`
+- [lib/defaultConfig.yml][default-config], `_config.yml` and `wikic.config.js` (in `wikic.cwd`) => `wikic.config`
 - `wikic.config`, `_config.yml` (subdirectory of `wikic.cwd`, closest to markdown file) => `context.site`
 - `context.page`, `context.site.page`, Front Matter in markdown => `context.page`
 
-The `_config.yml` in `wikic.cwd` will be loaded as `wikic.config`.
+The `_config.yml` and `wikic.config.js` in `wikic.cwd` will be loaded as `wikic.config`.
 
 The `_config.yml` closest to markdown will be merged into `context.site` (global config which is passed to plugins).
 
 Front Matter in each markdown will be merged into `context.page` (page config which is passed to plugins) respectively.
 
-Front Matter example:
+**Note**: In `wikic.cwd`, `wikic.config.js` > `_config.yml`
+
+**`wikic.config.js` Example**:
+
+``` javascript
+module.exports = {
+  title: 'Wikic',
+  toc: {
+    selectors: 'h2, h3, h4',
+  },
+};
+```
+
+**Front Matter example**:
 
 ``` yaml
 ---
@@ -197,43 +212,42 @@ The `context` passed to a plugin is an `Object` which contains some of the follo
 - renderContext: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
 - IS_DOC: boolean, whether in `docsPath`
 
-Use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins or write a `_plugins.js` in root of wikic folder:
+Use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins or use `wikic.config.js`:
 
 ``` javascript
 const htmlclean = require('htmlclean');
 
-exports.beforeWritePlugins = [
-  (context) => {
-    if (!context.data) return context;
-    const html = htmlclean(context.data);
-    return Object.assign({}, context, { data: html });
-  },
-];
-
-exports.afterReadPlugins = [
-  //...
-];
+module.exports = {
+  beforeWritePlugins: [
+    (context) => {
+      if (!context.data) return context;
+        const html = htmlclean(context.data);
+        return Object.assign({}, context, { data: html });
+    },
+  ],
+  afterReadPlugins: [
+    //...
+  ]
+};
 ```
 
 ## API
 
-### Wikic([cwd])
+### Wikic([cwd, [config]])
 
-Creates a Wikic
+- `cwd`: string, working dir, default value is `process.cwd()`
+- `config`: `Object`, overwrite config loaded from `cwd`'s `_config.yml` and `wikic.config.js`
 
-``` javascript
-const wikic = new Wikic();
-```
-
-You can pass a string to set `wikic.cwd`.
+Create a `Wikic`. Set working directory to `path/to` and set server's port to `1234`:
 
 ``` javascript
-const wikic = new Wikic('path/to');
+const wikic = new Wikic('path/to', { port: 1234 });
 ```
 
-### wikic.setup([cwd])
+### wikic.setup([cwd, [config]])
 
-- `cwd`: string, working dir, default value is `wikic.cwd || process.cwd()`
+- `cwd`: string, working dir, default value is `process.cwd()`
+- `config`: `Object`, overwrite content of `cwd`'s `_config.yml` and `wikic.config.js`
 - Returns: `this`
 
 Reloads configurations and layouts.
@@ -292,21 +306,19 @@ Serves the files in `PublicPath`
 
 See `defaultOptions` in [lib/utils/getList.js](https://github.com/dgeibi/wikic/blob/master/lib/utils/getList.js)
 
-You can also setListTemplate via `_plugins.js`:
+You can also set list template via `wikic.config.js`:
 
 ``` javascript
-exports.listTemplate = {
-    headerTemplate(
-    {
+module.exports = {
+  listTemplate: {
+    headerTemplate: ({
       level,
       index,
       typeName,
       typeSlug,
-    }
-  ) {
-    return `<label for="${level}-${index}">${typeName}</label>
-<input type="checkbox" id="${level}-${index}" data-type="${typeSlug}">`;
-  },
+    }) => `<label for="${level}-${index}">${typeName}</label>
+<input type="checkbox" id="${level}-${index}" data-type="${typeSlug}">`,
+  }
 };
 ```
 
