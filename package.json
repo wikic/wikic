@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "a simple static site generator",
   "main": "lib/index.js",
   "bin": {
@@ -28,7 +28,7 @@
     "github-slugger": "^1.1.1",
     "glob": "^7.1.1",
     "highlight.js": "^9.10.0",
-    "html-toc": "dgeibi/html-toc#618a18b",
+    "html-toc": "github:dgeibi/html-toc#618a18b",
     "js-yaml": "^3.8.3",
     "lodash": "^4.17.4",
     "markdown-it": "^8.3.1",
@@ -42,7 +42,7 @@
     "eslint-config-dgeibi": "github:dgeibi/eslint-config-dgeibi",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-no-async-without-await": "^1.2.0",
-    "jest": "^20.0.0",
+    "jest": "^20.0.1",
     "prettier-eslint-cli": "^3.2.0"
   },
   "engines": {
@@ -50,14 +50,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dgeibi/wikic.git"
+    "url": "git+https://github.com/wikic/wikic.git"
   },
   "bugs": {
-    "url": "https://github.com/dgeibi/wikic/issues"
+    "url": "https://github.com/wikic/wikic/issues"
   },
-  "homepage": "https://github.com/dgeibi/wikic#readme",
+  "homepage": "https://github.com/wikic/wikic#readme",
   "directories": {
+    "doc": "docs",
     "example": "example"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "keywords": [
     "wikic",

@@ -20,17 +20,20 @@ a simple static site generator
     - [Configuration and Front Matter](#configuration-and-front-matter)
     - [Layouts](#layouts)
     - [Plugins](#plugins)
+    - [Tasks](#tasks)
+    - [Suites](#suites)
 - [API](#api)
-    - [Wikic([cwd])](#wikiccwd)
-    - [wikic.setup([cwd])](#wikicsetupcwd)
+    - [Wikic([cwd, [config]])](#wikiccwd-config)
+    - [wikic.setup([cwd, [config]])](#wikicsetupcwd-config)
     - [wikic.clean()](#wikicclean)
     - [wikic.build()](#wikicbuild)
     - [wikic.addPlugin(key, plugin)](#wikicaddpluginkey-plugin)
+    - [wikic.addTask(key, task)](#wikicaddtaskkey-task)
+    - [wikic.addSuite(suite)](#wikicaddsuitesuite)
     - [wikic.watch()](#wikicwatch)
     - [wikic.serve()](#wikicserve)
     - [wikic.typeMap(key)](#wikictypemapkey)
     - [wikic.getURL(url)](#wikicgeturlurl)
-    - [wikic.setListTemplate(opts)](#wikicsetlisttemplateopts)
 - [Thanks](#thanks)
 - [LICENSE](#license)
 
@@ -72,6 +75,7 @@ wikic build [options]
 ``` javascript
 const htmlclean = require('htmlclean');
 const Wikic = require('wikic');
+const docslist = require('wikic-suite-docslist');
 
 const wikic = new Wikic();
 
@@ -81,6 +85,9 @@ wikic.addPlugin('beforeWrite', function minify(context) {
   const html = htmlclean(context.data);
   return Object.assign({}, context, { data: html });
 });
+
+// add suite to provide `list` variable
+wikic.addSuite(docslist);
 
 // build the site and start watcher and server to debug or preview
 wikic
@@ -139,7 +146,6 @@ module.exports = {
 title: Hello World # title of the page
 toc: false # disable toc for this page
 layout: docs # set layout for this page
-hide: true # hide this page from docs list(necessary for the file in docsPath)
 ---
 ```
 
@@ -162,10 +168,6 @@ Also, you can set `layout` in Front Matter for a specific markdown.
 - `page`, `Object`, reference to `context.page`
     - `page.types`, `Array`, markdown's dirnames
 - `content`, string, content of HTML built from markdown
-
-For markdowns in `docsPath`
-
-- `list`, string, list of documents in `docsPath`, See also [`wikic.setListTemplate(opts)`](#wikicsetlisttemplateopts)
 
 #### Builtin Filters
 
@@ -200,19 +202,31 @@ Variable `site` and `page` is available.
 
 ### Plugins
 
-A plugin is a `Function`, which receives a `context` and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
+A 'plugin' is a `Function`, which receives a `context` and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
+
+**context**
 
 The `context` passed to a plugin is an `Object` which contains some of the following properties:
 
-- src: string, absolute path of source
-- dist: string, absolute path of destination
-- data: string, content of document
-- site: `Object`, site config
-- page: `Object`, page config
-- renderContext: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
-- IS_DOC: boolean, whether in `docsPath`
+- `src`: string, absolute path of source
+- `dist`: string, absolute path of destination
+- `data`: string, content of document
+- `site`: `Object`, site config
+- `page`: `Object`, page config
+- `renderContext`: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
+- `IS_DOC`: boolean, whether in `docsPath`
 
-Use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins or use `wikic.config.js`:
+**Types of plugin**
+
+Different types of plugin will invoked in different periods.
+
+- `afterRead`: invoked after reading each markdown file.
+- `beforeWrite`: invoked before writing each markdown file.
+- `beforeRender`: invoked before rendering each markdown file.
+
+**Example**
+
+In `wikic.config.js`
 
 ``` javascript
 const htmlclean = require('htmlclean');
@@ -224,12 +238,106 @@ module.exports = {
         const html = htmlclean(context.data);
         return Object.assign({}, context, { data: html });
     },
-  ],
-  afterReadPlugins: [
-    //...
   ]
 };
 ```
+
+You can also use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins.
+
+### Tasks
+
+Unlike plugins, 'tasks' are `Function` without context.
+
+**Types of task**
+
+Different types of task will invoked in different periods.
+
+- `afterReadAllDocs`: after reading all docs, before writing all docs.
+- `beforeBuild`: before building all things.
+- `beforeBuildDocs`: before building all docs.
+- `afterBuild`: after building all things.
+- `afterBuildDocs`: after building all docs.
+
+**Example**
+
+In `wikic.config.js`
+
+``` javascript
+module.exports = {
+  beforeBuildTasks: [
+    function () {
+      console.time('build');
+    }
+  ],
+  afterBuildTasks: [
+    function () {
+      console.timeEnd('build');
+    }
+  ],
+};
+```
+
+You can also use [`wikic.addTask`](#wikicaddtaskkey-task) to add tasks.
+
+### Suites
+
+A 'suite' should be a combination of `plugins` and `tasks`. It should be a plain `Object` or a `Function` which receives `config` and returns an `Object` or a falsy value.
+
+**Properties**
+
+There are two kinds of property in suite.
+
+- Tasks:
+    - `afterReadAllDocs`
+    - `beforeBuild`
+    - `beforeBuildDocs`
+    - `afterBuild`
+    - `afterBuildDocs`
+- Plugins:
+    - `afterRead`
+    - `beforeWrite`
+    - `beforeRender`
+
+**Example**
+
+In `wikic.config.js`
+
+``` js
+// use an `Object` directly
+module.exports = {
+  suites: [
+    {
+      beforeBuild: function () {
+        console.time('build');
+      },
+      afterBuild: function () {
+        console.timeEnd('build');
+      }
+    }
+  ],
+};
+
+// or use a `Function`
+const showBuildTime = function(config) {
+  // if option `time` is falsy, do not add suite
+  if (!config.time) return null;
+
+  return {
+    beforeBuild: function () {
+      console.time('build');
+    },
+    afterBuild: function () {
+      console.timeEnd('build');
+    }
+  };
+}
+
+module.exports = {
+  suites: [showBuildTime],
+};
+```
+
+You can also use [`wikic.addSuite`](#wikicaddsuitesuite) to add suites.
 
 ## API
 
@@ -270,12 +378,22 @@ Builds all the files in `docsPath` and `root`
 - `plugin`: `Function`
 - Returns `this`
 
-Type of plugin:
+See also [Plugins](#plugins)
 
-- 'afterRead': executed after reading each markdown file in order.
-- 'beforeWrite': invoked before writing each markdown file in order.
+### wikic.addTask(key, task)
 
-See [Plugins](#plugins)
+- `key`: string, type of task
+- `task`: `Function`
+- Returns `this`
+
+See also [Tasks](#tasks)
+
+### wikic.addSuite(suite)
+
+- `suite`: `Object` | `Function`
+- Returns `this`
+
+See also [Suites](#suites)
 
 ### wikic.watch()
 
@@ -299,29 +417,6 @@ Serves the files in `PublicPath`
 - `url`: string
 - Returns an absolute URL prefixed with base URL
 
-### wikic.setListTemplate(opts)
-
-- `opts`: `Object` | `null`, contains document list templates
-- Returns `this`
-
-See `defaultOptions` in [lib/utils/getList.js](https://github.com/dgeibi/wikic/blob/master/lib/utils/getList.js)
-
-You can also set list template via `wikic.config.js`:
-
-``` javascript
-module.exports = {
-  listTemplate: {
-    headerTemplate: ({
-      level,
-      index,
-      typeName,
-      typeSlug,
-    }) => `<label for="${level}-${index}">${typeName}</label>
-<input type="checkbox" id="${level}-${index}" data-type="${typeSlug}">`,
-  }
-};
-```
-
 ## Thanks
 
 - [xcatliu/pagic](https://github.com/xcatliu/pagic)
@@ -333,13 +428,13 @@ module.exports = {
 
 [MIT][license]
 
-[default-config]: https://github.com/dgeibi/wikic/blob/master/lib/defaultConfig.yml
-[license]: https://github.com/dgeibi/wikic/blob/master/LICENSE
+[default-config]: https://github.com/wikic/wikic/blob/master/lib/defaultConfig.yml
+[license]: https://github.com/wikic/wikic/blob/master/LICENSE
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[coverage]: https://coveralls.io/github/dgeibi/wikic
-[coverage-badge]: https://img.shields.io/coveralls/dgeibi/wikic.svg
-[build]: https://travis-ci.org/dgeibi/wikic
-[build-badge]: https://travis-ci.org/dgeibi/wikic.svg?branch=master
+[coverage]: https://coveralls.io/github/wikic/wikic
+[coverage-badge]: https://img.shields.io/coveralls/wikic/wikic.svg
+[build]: https://travis-ci.org/wikic/wikic
+[build-badge]: https://travis-ci.org/wikic/wikic.svg?branch=master
 [node]: https://nodejs.org
 [node-badge]: https://img.shields.io/badge/node-%3E%3D%207.0.0-brightgreen.svg
 [version-badge]: https://img.shields.io/npm/v/wikic.svg

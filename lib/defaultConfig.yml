@@ -68,5 +68,12 @@ logger:
 # beforeWritePlugins: [] # Array<Function>
 # afterReadPlugins: [] # Array<Function>
 
-# listTemplate: # Object
-# # See lib/utils/getList.js
+# afterReadAllDocsTasks: [] # Array<Function>
+
+# beforeBuildTasks: [] # Array<Function>
+# beforeBuildDocsTasks: [] # Array<Function>
+
+# afterBuildTasks: [] # Array<Function>
+# afterBuildDocsTasks: [] # Array<Function>
+
+# suites: [] # Array<Object>
