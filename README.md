@@ -34,6 +34,9 @@ a simple static site generator
     - [wikic.serve()](#wikicserve)
     - [wikic.typeMap(key)](#wikictypemapkey)
     - [wikic.getURL(url)](#wikicgeturlurl)
+    - [wikic.fse](#wikicfse)
+    - [wikic.config](#wikicconfig)
+    - [wikic.renderer](#wikicrenderer)
 - [Thanks](#thanks)
 - [LICENSE](#license)
 
@@ -416,6 +419,22 @@ Serves the files in `PublicPath`
 
 - `url`: string
 - Returns an absolute URL prefixed with base URL
+
+### wikic.fse
+
+A shortcut for [jprichardson/node-fs-extra](https://github.com/jprichardson/node-fs-extra)
+
+### wikic.config
+
+User configuration
+
+See also [Configuration and Front Matter](#configuration-and-front-matter)
+
+### wikic.renderer
+
+Nunjucks renderer
+
+For usage, see [Nunjucks](https://mozilla.github.io/nunjucks/api.html)
 
 ## Thanks
 
