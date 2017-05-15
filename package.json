@@ -28,7 +28,7 @@
     "github-slugger": "^1.1.1",
     "glob": "^7.1.1",
     "highlight.js": "^9.10.0",
-    "html-toc": "github:dgeibi/html-toc#618a18b",
+    "html-toc": "^2.0.0",
     "js-yaml": "^3.8.3",
     "lodash": "^4.17.4",
     "markdown-it": "^8.3.1",
