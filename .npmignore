@@ -1,9 +1,10 @@
-/docs
+docs
 __mocks__
 __tests__
 .travis.yml
 .eslintrc
 .eslintignore
+yarn.lock
 
 # Logs
 logs
