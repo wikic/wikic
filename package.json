@@ -12,9 +12,11 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier-eslint --write './lib/**/*.js' './__mocks__/**/*.js' './bin/**.js'",
+    "build": "cp README.md example/index.md && node ./bin/wikic.js build -c -o docs -d example",
+    "pretest": "npm run lint",
     "test": "jest",
-    "build": "cp README.md example/index.md && ./bin/wikic.js build -c -o docs -d example",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "npm test -- --coverage",
+    "prepublish": "npm test && npm run format",
     "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
