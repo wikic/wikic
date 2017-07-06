@@ -1,8 +1,8 @@
 {
   "name": "wikic",
-  "version": "2.2.3",
+  "version": "3.0.0",
   "description": "a simple static site generator",
-  "main": "lib/index.js",
+  "main": "lib/wikic/index.js",
   "bin": {
     "wikic": "bin/wikic.js"
   },
@@ -20,7 +20,6 @@
     "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
-    "bluebird": "^3.5.0",
     "chokidar": "^1.6.1",
     "commander": "^2.9.0",
     "find-parent-dir": "^0.3.0",
