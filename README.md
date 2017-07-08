@@ -316,11 +316,11 @@ You can also use `wikic.registerSuite(suite)` to add suites.
 [default-config]: https://github.com/wikic/wikic/blob/master/lib/defaultConfig.yml
 [license]: https://github.com/wikic/wikic/blob/master/LICENSE
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[coverage]: https://coveralls.io/github/wikic/wikic
-[coverage-badge]: https://img.shields.io/coveralls/wikic/wikic.svg
+[coverage]: https://coveralls.io/github/wikic/wikic?branch=master
+[coverage-badge]: https://coveralls.io/repos/github/wikic/wikic/badge.svg?branch=master
 [build]: https://travis-ci.org/wikic/wikic
 [build-badge]: https://travis-ci.org/wikic/wikic.svg?branch=master
 [node]: https://nodejs.org
-[node-badge]: https://img.shields.io/badge/node-%3E%3D%207.0.0-brightgreen.svg
+[node-badge]: https://img.shields.io/badge/node-%3E%3D%208.1.3-brightgreen.svg
 [version-badge]: https://img.shields.io/npm/v/wikic.svg
 [package]: https://www.npmjs.com/package/wikic
