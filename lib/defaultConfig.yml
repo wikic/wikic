@@ -27,6 +27,8 @@ excludes: []
 typeMap: {}
 # map from dirname to typeName
 
+typeNameTitleCase: true
+
 page:
 # default page config
   layout: default
@@ -65,15 +67,4 @@ logger:
 #   typography: true
 #   highlight: # Function, use highlight.js
 
-# beforeWritePlugins: [] # Array<Function>
-# afterReadPlugins: [] # Array<Function>
-
-# afterReadAllDocsTasks: [] # Array<Function>
-
-# beforeBuildTasks: [] # Array<Function>
-# beforeBuildDocsTasks: [] # Array<Function>
-
-# afterBuildTasks: [] # Array<Function>
-# afterBuildDocsTasks: [] # Array<Function>
-
-# suites: [] # Array<Object>
+# suites: [] # Array<string|Object>
