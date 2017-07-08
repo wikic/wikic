@@ -61,10 +61,10 @@ logger:
 
 # markdownIt:
 # # See https://github.com/markdown-it/markdown-it#init-with-presets-and-options
-# # See lib/plugins/mdFilter.js
+# # See lib/filters/markdown.js
 #   html: true
 #   linkify: true
 #   typography: true
 #   highlight: # Function, use highlight.js
 
-# suites: [] # Array<string|Object>
+# suites: [] # Array<string(module id)|object|function(config,Wikic)>

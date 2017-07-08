@@ -17,12 +17,20 @@
 <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D%207.0.0-brightgreen.svg" alt="Node"></a></p>
 <p>a simple static site generator</p>
 <h2 id="table-of-contents">Table of Contents<a class="anchor" href="#table-of-contents"></a></h2>
+<!-- TOC -->
+<ul>
+<li><a href="#wikic">Wikic</a>
 <ul>
 <li><a href="#table-of-contents">Table of Contents</a></li>
 <li><a href="#example">Example</a></li>
 <li><a href="#usage">Usage</a>
 <ul>
-<li><a href="#cli">CLI</a></li>
+<li><a href="#cli">CLI</a>
+<ul>
+<li><a href="#wikic-init"><code>wikic init</code></a></li>
+<li><a href="#wikic-build"><code>wikic build</code></a></li>
+</ul>
+</li>
 <li><a href="#node-module">Node module</a></li>
 </ul>
 </li>
@@ -30,33 +38,23 @@
 <ul>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#configuration-and-front-matter">Configuration and Front Matter</a></li>
-<li><a href="#layouts">Layouts</a></li>
-<li><a href="#plugins">Plugins</a></li>
-<li><a href="#tasks">Tasks</a></li>
-<li><a href="#suites">Suites</a></li>
+<li><a href="#layouts">Layouts</a>
+<ul>
+<li><a href="#variables-in-layouts">Variables in Layouts</a></li>
+<li><a href="#builtin-filters">Builtin Filters</a></li>
+<li><a href="#nunjucks-in-markdown">Nunjucks in Markdown</a></li>
 </ul>
 </li>
-<li><a href="#api">API</a>
-<ul>
-<li><a href="#wikiccwd-config">Wikic([cwd, [config]])</a></li>
-<li><a href="#wikicsetupcwd-config">wikic.setup([cwd, [config]])</a></li>
-<li><a href="#wikicclean">wikic.clean()</a></li>
-<li><a href="#wikicbuild">wikic.build()</a></li>
-<li><a href="#wikicaddpluginkey-plugin">wikic.addPlugin(key, plugin)</a></li>
-<li><a href="#wikicaddtaskkey-task">wikic.addTask(key, task)</a></li>
-<li><a href="#wikicaddsuitesuite">wikic.addSuite(suite)</a></li>
-<li><a href="#wikicwatch">wikic.watch()</a></li>
-<li><a href="#wikicserve">wikic.serve()</a></li>
-<li><a href="#wikictypemapkey">wikic.typeMap(key)</a></li>
-<li><a href="#wikicgeturlurl">wikic.getURL(url)</a></li>
-<li><a href="#wikicfse">wikic.fse</a></li>
-<li><a href="#wikicconfig">wikic.config</a></li>
-<li><a href="#wikicrenderer">wikic.renderer</a></li>
+<li><a href="#filter">Filter</a></li>
+<li><a href="#suite">Suite</a></li>
 </ul>
 </li>
 <li><a href="#thanks">Thanks</a></li>
 <li><a href="#license">LICENSE</a></li>
 </ul>
+</li>
+</ul>
+<!-- /TOC -->
 <h2 id="example">Example<a class="anchor" href="#example"></a></h2>
 <ul>
 <li><a href="https://github.com/dgeibi/note">dgeibi/note</a></li>
@@ -87,15 +85,15 @@
 
 <span class="hljs-keyword">const</span> wikic = <span class="hljs-keyword">new</span> Wikic();
 
-<span class="hljs-comment">// add plugin to minify html before write</span>
-wikic.addPlugin(<span class="hljs-string">&apos;beforeWrite&apos;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">minify</span>(<span class="hljs-params">context</span>) </span>{
+<span class="hljs-comment">// add filter to minify html before write</span>
+wikic.filter.register(<span class="hljs-string">&apos;beforeWrite&apos;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">minify</span>(<span class="hljs-params">context</span>) </span>{
   <span class="hljs-keyword">if</span> (!context.data) <span class="hljs-keyword">return</span> context;
-  <span class="hljs-keyword">const</span> html = htmlclean(context.data);
-  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.assign({}, context, { <span class="hljs-attr">data</span>: html });
+  context.data = htmlclean(context.data);
+  <span class="hljs-keyword">return</span> context;
 });
 
 <span class="hljs-comment">// add suite to provide `list` variable</span>
-wikic.addSuite(docslist);
+wikic.registerSuite(docslist);
 
 <span class="hljs-comment">// build the site and start watcher and server to debug or preview</span>
 wikic
@@ -121,8 +119,8 @@ npm install --save wikic
 <li><code>context.page</code>, <code>context.site.page</code>, Front Matter in markdown =&gt; <code>context.page</code></li>
 </ul>
 <p>The <code>_config.yml</code> and <code>wikic.config.js</code> in <code>wikic.cwd</code> will be loaded as <code>wikic.config</code>.</p>
-<p>The <code>_config.yml</code> closest to markdown will be merged into <code>context.site</code> (global config which is passed to plugins).</p>
-<p>Front Matter in each markdown will be merged into <code>context.page</code> (page config which is passed to plugins) respectively.</p>
+<p>The <code>_config.yml</code> closest to markdown will be merged into <code>context.site</code>.</p>
+<p>Front Matter in each markdown will be merged into <code>context.page</code> respectively.</p>
 <p><strong>Note</strong>: In <code>wikic.cwd</code>, <code>wikic.config.js</code> &gt; <code>_config.yml</code></p>
 <p><strong><code>wikic.config.js</code> Example</strong>:</p>
 <pre class="hljs"><code><span class="hljs-built_in">module</span>.exports = {
@@ -158,10 +156,11 @@ npm install --save wikic
 </ul>
 <h4 id="builtin-filters">Builtin Filters<a class="anchor" href="#builtin-filters"></a></h4>
 <ul>
-<li><code>typeMap</code>: see <a href="#wikictypemapkey"><code>wikic.typeMap(key)</code></a></li>
-<li><code>baseurl</code>: see <a href="#wikicgeturlurl"><code>wikic.getURL(url)</code></a></li>
+<li><code>typeMap</code>: Get typeName set in <code>wikic.config.typeMap</code></li>
+<li><code>baseurl</code>: Get a URL prefixed with base URL</li>
 <li><code>relative</code>: Receives a absolute path string, returns a url relative to current page.</li>
-<li><code>typeMaps</code>: Receives a <code>Array</code>, Returns <code>array.map(typeMap)</code>. Tips: get typeNames array <code>{{ page.types | typeMaps }}</code></li>
+<li><code>typeMaps</code>: Receives a <code>Array</code>, Returns <code>array.map(typeMap)</code>.
+Tips: get typeNames array <code>{{ page.types | typeMaps }}</code></li>
 </ul>
 <h4 id="nunjucks-in-markdown">Nunjucks in Markdown<a class="anchor" href="#nunjucks-in-markdown"></a></h4>
 <p>Variable <code>site</code> and <code>page</code> is available.</p>
@@ -180,10 +179,31 @@ npm install --save wikic
 <span class="hljs-comment">&lt;!-- output --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">code</span>&gt;</span>{{ page.title }}<span class="hljs-tag">&lt;/<span class="hljs-name">code</span>&gt;</span>
 </code></pre>
-<h3 id="plugins">Plugins<a class="anchor" href="#plugins"></a></h3>
-<p>A &apos;plugin&apos; is a <code>Function</code>, which receives a <code>context</code> and returns a <code>context</code>. If a plugin is invoked, <code>this</code> in it may point to <code>wikic</code>. The context returned by a plugin will be passed to next plugin.</p>
+<h3 id="filter">Filter<a class="anchor" href="#filter"></a></h3>
+<pre class="hljs"><code><span class="hljs-keyword">const</span> filter = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">context, wikic</span>) </span>{
+  <span class="hljs-keyword">const</span> newContext = <span class="hljs-built_in">Object</span>.assign({}, context);
+  <span class="hljs-comment">// do something with newContext</span>
+  <span class="hljs-keyword">return</span> newContext;
+}
+</code></pre>
+<p>A &apos;filter&apos; is a <code>Function</code>, which receives a <code>context</code> and the <code>wikic</code> and returns a <code>context</code>.</p>
+<p>The context returned by the filter will be passed to next one.</p>
 <p><strong>context</strong></p>
-<p>The <code>context</code> passed to a plugin is an <code>Object</code> which contains some of the following properties:</p>
+<p><code>context</code> of the following types of filter is <code>null</code></p>
+<ul>
+<li><code>afterReadAllDocs</code>: after reading all docs, before writing all docs.</li>
+<li><code>beforeBuild</code>: before building all things.</li>
+<li><code>beforeBuildDocs</code>: before building all docs.</li>
+<li><code>afterBuild</code>: after building all things.</li>
+<li><code>afterBuildDocs</code>: after building all docs.</li>
+</ul>
+<p><code>context</code> passed to following types of filter is an <code>Object</code></p>
+<ul>
+<li><code>afterRead</code>: invoked after reading each markdown file.</li>
+<li><code>beforeWrite</code>: invoked before writing each markdown file.</li>
+<li><code>beforeRender</code>: invoked before rendering each markdown file.</li>
+</ul>
+<p>The context may contains the following properties:</p>
 <ul>
 <li><code>src</code>: string, absolute path of source</li>
 <li><code>dist</code>: string, absolute path of destination</li>
@@ -193,81 +213,20 @@ npm install --save wikic
 <li><code>renderContext</code>: <code>Object</code>, nunjucks render context, contains <a href="#variables-in-layouts">variables</a></li>
 <li><code>IS_DOC</code>: boolean, whether in <code>docsPath</code></li>
 </ul>
-<p><strong>Types of plugin</strong></p>
-<p>Different types of plugin will invoked in different periods.</p>
+<p>You can use <code>wikic.filter.register(type, filter)</code> to register filters.</p>
+<h3 id="suite">Suite<a class="anchor" href="#suite"></a></h3>
+<p>A suite should be a combination of filters.</p>
+<p>It should be</p>
 <ul>
-<li><code>afterRead</code>: invoked after reading each markdown file.</li>
-<li><code>beforeWrite</code>: invoked before writing each markdown file.</li>
-<li><code>beforeRender</code>: invoked before rendering each markdown file.</li>
+<li>a <code>string</code> which is a module id relative to <code>wikic.cwd</code></li>
+<li>a plain <code>Object</code></li>
+<li>or a <code>Function</code> which receives <code>config</code> and returns an <code>Object</code> or a falsy value.</li>
 </ul>
+<p>Suite objects&apos; property name should be a <a href="#filter">filter</a>&apos;s type name.</p>
 <p><strong>Example</strong></p>
-<p>In <code>wikic.config.js</code></p>
-<pre class="hljs"><code><span class="hljs-keyword">const</span> htmlclean = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;htmlclean&apos;</span>);
-
-<span class="hljs-built_in">module</span>.exports = {
-  <span class="hljs-attr">beforeWritePlugins</span>: [
-    <span class="hljs-function">(<span class="hljs-params">context</span>) =&gt;</span> {
-      <span class="hljs-keyword">if</span> (!context.data) <span class="hljs-keyword">return</span> context;
-        <span class="hljs-keyword">const</span> html = htmlclean(context.data);
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.assign({}, context, { <span class="hljs-attr">data</span>: html });
-    },
-  ]
-};
-</code></pre>
-<p>You can also use <a href="#wikicaddpluginkey-plugin"><code>wikic.addPlugin</code></a> to add plugins.</p>
-<h3 id="tasks">Tasks<a class="anchor" href="#tasks"></a></h3>
-<p>Unlike plugins, &apos;tasks&apos; are <code>Function</code> without context.</p>
-<p><strong>Types of task</strong></p>
-<p>Different types of task will invoked in different periods.</p>
-<ul>
-<li><code>afterReadAllDocs</code>: after reading all docs, before writing all docs.</li>
-<li><code>beforeBuild</code>: before building all things.</li>
-<li><code>beforeBuildDocs</code>: before building all docs.</li>
-<li><code>afterBuild</code>: after building all things.</li>
-<li><code>afterBuildDocs</code>: after building all docs.</li>
-</ul>
-<p><strong>Example</strong></p>
-<p>In <code>wikic.config.js</code></p>
+<p>Register suites in <code>wikic.config.js</code></p>
+<p>Use <code>Object</code></p>
 <pre class="hljs"><code><span class="hljs-built_in">module</span>.exports = {
-  <span class="hljs-attr">beforeBuildTasks</span>: [
-    <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-built_in">console</span>.time(<span class="hljs-string">&apos;build&apos;</span>);
-    }
-  ],
-  <span class="hljs-attr">afterBuildTasks</span>: [
-    <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-built_in">console</span>.timeEnd(<span class="hljs-string">&apos;build&apos;</span>);
-    }
-  ],
-};
-</code></pre>
-<p>You can also use <a href="#wikicaddtaskkey-task"><code>wikic.addTask</code></a> to add tasks.</p>
-<h3 id="suites">Suites<a class="anchor" href="#suites"></a></h3>
-<p>A &apos;suite&apos; should be a combination of <code>plugins</code> and <code>tasks</code>. It should be a plain <code>Object</code> or a <code>Function</code> which receives <code>config</code> and returns an <code>Object</code> or a falsy value.</p>
-<p><strong>Properties</strong></p>
-<p>There are two kinds of property in suite.</p>
-<ul>
-<li>Tasks:
-<ul>
-<li><code>afterReadAllDocs</code></li>
-<li><code>beforeBuild</code></li>
-<li><code>beforeBuildDocs</code></li>
-<li><code>afterBuild</code></li>
-<li><code>afterBuildDocs</code></li>
-</ul>
-</li>
-<li>Plugins:
-<ul>
-<li><code>afterRead</code></li>
-<li><code>beforeWrite</code></li>
-<li><code>beforeRender</code></li>
-</ul>
-</li>
-</ul>
-<p><strong>Example</strong></p>
-<p>In <code>wikic.config.js</code></p>
-<pre class="hljs"><code><span class="hljs-comment">// use an `Object` directly</span>
-<span class="hljs-built_in">module</span>.exports = {
   <span class="hljs-attr">suites</span>: [
     {
       <span class="hljs-attr">beforeBuild</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
@@ -279,9 +238,9 @@ npm install --save wikic
     }
   ],
 };
-
-<span class="hljs-comment">// or use a `Function`</span>
-<span class="hljs-keyword">const</span> showBuildTime = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">config</span>) </span>{
+</code></pre>
+<p>Use <code>Function</code></p>
+<pre class="hljs"><code><span class="hljs-keyword">const</span> showBuildTime = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">config</span>) </span>{
   <span class="hljs-comment">// if option `time` is falsy, do not add suite</span>
   <span class="hljs-keyword">if</span> (!config.time) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
 
@@ -299,83 +258,15 @@ npm install --save wikic
   <span class="hljs-attr">suites</span>: [showBuildTime],
 };
 </code></pre>
-<p>You can also use <a href="#wikicaddsuitesuite"><code>wikic.addSuite</code></a> to add suites.</p>
-<h2 id="api">API<a class="anchor" href="#api"></a></h2>
-<h3 id="wikiccwd-config">Wikic([cwd, [config]])<a class="anchor" href="#wikiccwd-config"></a></h3>
-<ul>
-<li><code>cwd</code>: string, working dir, default value is <code>process.cwd()</code></li>
-<li><code>config</code>: <code>Object</code>, overwrite config loaded from <code>cwd</code>&apos;s <code>_config.yml</code> and <code>wikic.config.js</code></li>
-</ul>
-<p>Create a <code>Wikic</code>. Set working directory to <code>path/to</code> and set server&apos;s port to <code>1234</code>:</p>
-<pre class="hljs"><code><span class="hljs-keyword">const</span> wikic = <span class="hljs-keyword">new</span> Wikic(<span class="hljs-string">&apos;path/to&apos;</span>, { <span class="hljs-attr">port</span>: <span class="hljs-number">1234</span> });
+<p>Use module ID</p>
+<pre class="hljs"><code><span class="hljs-built_in">module</span>.exports = {
+  <span class="hljs-attr">suites</span>: [<span class="hljs-string">&apos;wikic-suite-docslist&apos;</span>]
+};
 </code></pre>
-<h3 id="wikicsetupcwd-config">wikic.setup([cwd, [config]])<a class="anchor" href="#wikicsetupcwd-config"></a></h3>
-<ul>
-<li><code>cwd</code>: string, working dir, default value is <code>process.cwd()</code></li>
-<li><code>config</code>: <code>Object</code>, overwrite content of <code>cwd</code>&apos;s <code>_config.yml</code> and <code>wikic.config.js</code></li>
-<li>Returns: <code>this</code></li>
-</ul>
-<p>Reloads configurations and layouts.</p>
-<h3 id="wikicclean">wikic.clean()<a class="anchor" href="#wikicclean"></a></h3>
-<ul>
-<li>Returns a <code>Promise</code></li>
-</ul>
-<p>Cleans all the files in <code>publicPath</code></p>
-<h3 id="wikicbuild">wikic.build()<a class="anchor" href="#wikicbuild"></a></h3>
-<ul>
-<li>Returns a <code>Promise</code></li>
-</ul>
-<p>Builds all the files in <code>docsPath</code> and <code>root</code></p>
-<h3 id="wikicaddpluginkey-plugin">wikic.addPlugin(key, plugin)<a class="anchor" href="#wikicaddpluginkey-plugin"></a></h3>
-<ul>
-<li><code>key</code>: string, type of plugin</li>
-<li><code>plugin</code>: <code>Function</code></li>
-<li>Returns <code>this</code></li>
-</ul>
-<p>See also <a href="#plugins">Plugins</a></p>
-<h3 id="wikicaddtaskkey-task">wikic.addTask(key, task)<a class="anchor" href="#wikicaddtaskkey-task"></a></h3>
-<ul>
-<li><code>key</code>: string, type of task</li>
-<li><code>task</code>: <code>Function</code></li>
-<li>Returns <code>this</code></li>
-</ul>
-<p>See also <a href="#tasks">Tasks</a></p>
-<h3 id="wikicaddsuitesuite">wikic.addSuite(suite)<a class="anchor" href="#wikicaddsuitesuite"></a></h3>
-<ul>
-<li><code>suite</code>: <code>Object</code> | <code>Function</code></li>
-<li>Returns <code>this</code></li>
-</ul>
-<p>See also <a href="#suites">Suites</a></p>
-<h3 id="wikicwatch">wikic.watch()<a class="anchor" href="#wikicwatch"></a></h3>
-<ul>
-<li>Returns <code>this</code></li>
-</ul>
-<p>Watches file change and run <code>wikic.build()</code> when changed</p>
-<h3 id="wikicserve">wikic.serve()<a class="anchor" href="#wikicserve"></a></h3>
-<ul>
-<li>Returns a <code>Promise</code></li>
-</ul>
-<p>Serves the files in <code>PublicPath</code></p>
-<h3 id="wikictypemapkey">wikic.typeMap(key)<a class="anchor" href="#wikictypemapkey"></a></h3>
-<ul>
-<li><code>key</code>: string</li>
-<li>Returns typeName(a string) set in <code>wikic.config.typeMap</code></li>
-</ul>
-<h3 id="wikicgeturlurl">wikic.getURL(url)<a class="anchor" href="#wikicgeturlurl"></a></h3>
-<ul>
-<li><code>url</code>: string</li>
-<li>Returns an absolute URL prefixed with base URL</li>
-</ul>
-<h3 id="wikicfse">wikic.fse<a class="anchor" href="#wikicfse"></a></h3>
-<p>A shortcut for <a href="https://github.com/jprichardson/node-fs-extra">jprichardson/node-fs-extra</a></p>
-<h3 id="wikicconfig">wikic.config<a class="anchor" href="#wikicconfig"></a></h3>
-<p>User configuration</p>
-<p>See also <a href="#configuration-and-front-matter">Configuration and Front Matter</a></p>
-<h3 id="wikicrenderer">wikic.renderer<a class="anchor" href="#wikicrenderer"></a></h3>
-<p>Nunjucks renderer</p>
-<p>For usage, see <a href="https://mozilla.github.io/nunjucks/api.html">Nunjucks</a></p>
+<p>You can also use <code>wikic.registerSuite(suite)</code> to add suites.</p>
 <h2 id="thanks">Thanks<a class="anchor" href="#thanks"></a></h2>
 <ul>
+<li><a href="https://github.com/hexojs/hexo">hexojs/hexo</a></li>
 <li><a href="https://github.com/xcatliu/pagic">xcatliu/pagic</a></li>
 <li><a href="https://github.com/jonschlinkert/html-toc">jonschlinkert/html-toc</a></li>
 <li><a href="http://adrianmejia.com/blog/2016/08/24/Building-a-Node-js-static-file-server-files-over-HTTP-using-ES6/">Adrian Mejia Blog</a></li>

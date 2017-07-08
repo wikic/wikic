@@ -10,35 +10,29 @@ a simple static site generator
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-- [Example](#example)
-- [Usage](#usage)
+<!-- TOC -->
+
+- [Wikic](#wikic)
+  - [Table of Contents](#table-of-contents)
+  - [Example](#example)
+  - [Usage](#usage)
     - [CLI](#cli)
+      - [`wikic init`](#wikic-init)
+      - [`wikic build`](#wikic-build)
     - [Node module](#node-module)
-- [Getting started](#getting-started)
+  - [Getting started](#getting-started)
     - [Installation](#installation)
     - [Configuration and Front Matter](#configuration-and-front-matter)
     - [Layouts](#layouts)
-    - [Plugins](#plugins)
-    - [Tasks](#tasks)
-    - [Suites](#suites)
-- [API](#api)
-    - [Wikic([cwd, [config]])](#wikiccwd-config)
-    - [wikic.setup([cwd, [config]])](#wikicsetupcwd-config)
-    - [wikic.clean()](#wikicclean)
-    - [wikic.build()](#wikicbuild)
-    - [wikic.addPlugin(key, plugin)](#wikicaddpluginkey-plugin)
-    - [wikic.addTask(key, task)](#wikicaddtaskkey-task)
-    - [wikic.addSuite(suite)](#wikicaddsuitesuite)
-    - [wikic.watch()](#wikicwatch)
-    - [wikic.serve()](#wikicserve)
-    - [wikic.typeMap(key)](#wikictypemapkey)
-    - [wikic.getURL(url)](#wikicgeturlurl)
-    - [wikic.fse](#wikicfse)
-    - [wikic.config](#wikicconfig)
-    - [wikic.renderer](#wikicrenderer)
-- [Thanks](#thanks)
-- [LICENSE](#license)
+      - [Variables in Layouts](#variables-in-layouts)
+      - [Builtin Filters](#builtin-filters)
+      - [Nunjucks in Markdown](#nunjucks-in-markdown)
+    - [Filter](#filter)
+    - [Suite](#suite)
+  - [Thanks](#thanks)
+  - [LICENSE](#license)
+
+<!-- /TOC -->
 
 ## Example
 
@@ -82,15 +76,15 @@ const docslist = require('wikic-suite-docslist');
 
 const wikic = new Wikic();
 
-// add plugin to minify html before write
-wikic.addPlugin('beforeWrite', function minify(context) {
+// add filter to minify html before write
+wikic.filter.register('beforeWrite', function minify(context) {
   if (!context.data) return context;
-  const html = htmlclean(context.data);
-  return Object.assign({}, context, { data: html });
+  context.data = htmlclean(context.data);
+  return context;
 });
 
 // add suite to provide `list` variable
-wikic.addSuite(docslist);
+wikic.registerSuite(docslist);
 
 // build the site and start watcher and server to debug or preview
 wikic
@@ -125,9 +119,9 @@ Here are inheritance chains of configuration:
 
 The `_config.yml` and `wikic.config.js` in `wikic.cwd` will be loaded as `wikic.config`.
 
-The `_config.yml` closest to markdown will be merged into `context.site` (global config which is passed to plugins).
+The `_config.yml` closest to markdown will be merged into `context.site`.
 
-Front Matter in each markdown will be merged into `context.page` (page config which is passed to plugins) respectively.
+Front Matter in each markdown will be merged into `context.page` respectively.
 
 **Note**: In `wikic.cwd`, `wikic.config.js` > `_config.yml`
 
@@ -174,10 +168,11 @@ Also, you can set `layout` in Front Matter for a specific markdown.
 
 #### Builtin Filters
 
-- `typeMap`: see [`wikic.typeMap(key)`](#wikictypemapkey)
-- `baseurl`: see [`wikic.getURL(url)`](#wikicgeturlurl)
+- `typeMap`: Get typeName set in `wikic.config.typeMap`
+- `baseurl`: Get a URL prefixed with base URL
 - `relative`: Receives a absolute path string, returns a url relative to current page.
-- `typeMaps`: Receives a `Array`, Returns `array.map(typeMap)`. Tips: get typeNames array `{{ page.types | typeMaps }}`
+- `typeMaps`: Receives a `Array`, Returns `array.map(typeMap)`.
+   Tips: get typeNames array `{{ page.types | typeMaps }}`
 
 #### Nunjucks in Markdown
 
@@ -203,13 +198,37 @@ Variable `site` and `page` is available.
 <code>{{ page.title }}</code>
 ```
 
-### Plugins
+### Filter
 
-A 'plugin' is a `Function`, which receives a `context` and returns a `context`. If a plugin is invoked, `this` in it may point to `wikic`. The context returned by a plugin will be passed to next plugin.
+```js
+const filter = function (context, wikic) {
+  const newContext = Object.assign({}, context);
+  // do something with newContext
+  return newContext;
+}
+```
+
+A 'filter' is a `Function`, which receives a `context` and the `wikic` and returns a `context`.
+
+The context returned by the filter will be passed to next one.
 
 **context**
 
-The `context` passed to a plugin is an `Object` which contains some of the following properties:
+`context` of the following types of filter is `null`
+
+- `afterReadAllDocs`: after reading all docs, before writing all docs.
+- `beforeBuild`: before building all things.
+- `beforeBuildDocs`: before building all docs.
+- `afterBuild`: after building all things.
+- `afterBuildDocs`: after building all docs.
+
+`context` passed to following types of filter is an `Object`
+
+- `afterRead`: invoked after reading each markdown file.
+- `beforeWrite`: invoked before writing each markdown file.
+- `beforeRender`: invoked before rendering each markdown file.
+
+The context may contains the following properties:
 
 - `src`: string, absolute path of source
 - `dist`: string, absolute path of destination
@@ -219,94 +238,25 @@ The `context` passed to a plugin is an `Object` which contains some of the follo
 - `renderContext`: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)
 - `IS_DOC`: boolean, whether in `docsPath`
 
-**Types of plugin**
+You can use `wikic.filter.register(type, filter)` to register filters.
 
-Different types of plugin will invoked in different periods.
+### Suite
 
-- `afterRead`: invoked after reading each markdown file.
-- `beforeWrite`: invoked before writing each markdown file.
-- `beforeRender`: invoked before rendering each markdown file.
+A suite should be a combination of filters.
 
-**Example**
+It should be
+- a `string` which is a module id relative to `wikic.cwd`
+- a plain `Object`
+- or a `Function` which receives `config` and returns an `Object` or a falsy value.
 
-In `wikic.config.js`
-
-``` javascript
-const htmlclean = require('htmlclean');
-
-module.exports = {
-  beforeWritePlugins: [
-    (context) => {
-      if (!context.data) return context;
-        const html = htmlclean(context.data);
-        return Object.assign({}, context, { data: html });
-    },
-  ]
-};
-```
-
-You can also use [`wikic.addPlugin`](#wikicaddpluginkey-plugin) to add plugins.
-
-### Tasks
-
-Unlike plugins, 'tasks' are `Function` without context.
-
-**Types of task**
-
-Different types of task will invoked in different periods.
-
-- `afterReadAllDocs`: after reading all docs, before writing all docs.
-- `beforeBuild`: before building all things.
-- `beforeBuildDocs`: before building all docs.
-- `afterBuild`: after building all things.
-- `afterBuildDocs`: after building all docs.
+Suite objects' property name should be a [filter](#filter)'s type name.
 
 **Example**
 
-In `wikic.config.js`
+Register suites in `wikic.config.js`
 
-``` javascript
-module.exports = {
-  beforeBuildTasks: [
-    function () {
-      console.time('build');
-    }
-  ],
-  afterBuildTasks: [
-    function () {
-      console.timeEnd('build');
-    }
-  ],
-};
-```
-
-You can also use [`wikic.addTask`](#wikicaddtaskkey-task) to add tasks.
-
-### Suites
-
-A 'suite' should be a combination of `plugins` and `tasks`. It should be a plain `Object` or a `Function` which receives `config` and returns an `Object` or a falsy value.
-
-**Properties**
-
-There are two kinds of property in suite.
-
-- Tasks:
-    - `afterReadAllDocs`
-    - `beforeBuild`
-    - `beforeBuildDocs`
-    - `afterBuild`
-    - `afterBuildDocs`
-- Plugins:
-    - `afterRead`
-    - `beforeWrite`
-    - `beforeRender`
-
-**Example**
-
-In `wikic.config.js`
-
+Use `Object`
 ``` js
-// use an `Object` directly
 module.exports = {
   suites: [
     {
@@ -319,8 +269,10 @@ module.exports = {
     }
   ],
 };
+```
 
-// or use a `Function`
+Use `Function`
+``` js
 const showBuildTime = function(config) {
   // if option `time` is falsy, do not add suite
   if (!config.time) return null;
@@ -340,104 +292,18 @@ module.exports = {
 };
 ```
 
-You can also use [`wikic.addSuite`](#wikicaddsuitesuite) to add suites.
-
-## API
-
-### Wikic([cwd, [config]])
-
-- `cwd`: string, working dir, default value is `process.cwd()`
-- `config`: `Object`, overwrite config loaded from `cwd`'s `_config.yml` and `wikic.config.js`
-
-Create a `Wikic`. Set working directory to `path/to` and set server's port to `1234`:
-
-``` javascript
-const wikic = new Wikic('path/to', { port: 1234 });
+Use module ID
+``` js
+module.exports = {
+  suites: ['wikic-suite-docslist']
+};
 ```
 
-### wikic.setup([cwd, [config]])
-
-- `cwd`: string, working dir, default value is `process.cwd()`
-- `config`: `Object`, overwrite content of `cwd`'s `_config.yml` and `wikic.config.js`
-- Returns: `this`
-
-Reloads configurations and layouts.
-
-### wikic.clean()
-
-- Returns a `Promise`
-
-Cleans all the files in `publicPath`
-
-### wikic.build()
-
-- Returns a `Promise`
-
-Builds all the files in `docsPath` and `root`
-
-### wikic.addPlugin(key, plugin)
-
-- `key`: string, type of plugin
-- `plugin`: `Function`
-- Returns `this`
-
-See also [Plugins](#plugins)
-
-### wikic.addTask(key, task)
-
-- `key`: string, type of task
-- `task`: `Function`
-- Returns `this`
-
-See also [Tasks](#tasks)
-
-### wikic.addSuite(suite)
-
-- `suite`: `Object` | `Function`
-- Returns `this`
-
-See also [Suites](#suites)
-
-### wikic.watch()
-
-- Returns `this`
-
-Watches file change and run `wikic.build()` when changed
-
-### wikic.serve()
-
-- Returns a `Promise`
-
-Serves the files in `PublicPath`
-
-### wikic.typeMap(key)
-
-- `key`: string
-- Returns typeName(a string) set in `wikic.config.typeMap`
-
-### wikic.getURL(url)
-
-- `url`: string
-- Returns an absolute URL prefixed with base URL
-
-### wikic.fse
-
-A shortcut for [jprichardson/node-fs-extra](https://github.com/jprichardson/node-fs-extra)
-
-### wikic.config
-
-User configuration
-
-See also [Configuration and Front Matter](#configuration-and-front-matter)
-
-### wikic.renderer
-
-Nunjucks renderer
-
-For usage, see [Nunjucks](https://mozilla.github.io/nunjucks/api.html)
+You can also use `wikic.registerSuite(suite)` to add suites.
 
 ## Thanks
 
+- [hexojs/hexo](https://github.com/hexojs/hexo)
 - [xcatliu/pagic](https://github.com/xcatliu/pagic)
 - [jonschlinkert/html-toc](https://github.com/jonschlinkert/html-toc)
 - [Adrian Mejia Blog](http://adrianmejia.com/blog/2016/08/24/Building-a-Node-js-static-file-server-files-over-HTTP-using-ES6/)
