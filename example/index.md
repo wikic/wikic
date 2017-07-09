@@ -30,6 +30,7 @@ a simple static site generator
     - [Filter](#filter)
     - [Suite](#suite)
   - [Thanks](#thanks)
+  - [API](#api)
   - [LICENSE](#license)
 
 <!-- /TOC -->
@@ -309,10 +310,15 @@ You can also use `wikic.registerSuite(suite)` to add suites.
 - [Adrian Mejia Blog](http://adrianmejia.com/blog/2016/08/24/Building-a-Node-js-static-file-server-files-over-HTTP-using-ES6/)
 - ...
 
+## API
+
+See JSDoc in [lib/wikic/index.js][index.js]
+
 ## LICENSE
 
 [MIT][license]
 
+[index.js]: https://github.com/wikic/wikic/blob/master/lib/wikic/index.js
 [default-config]: https://github.com/wikic/wikic/blob/master/lib/defaultConfig.yml
 [license]: https://github.com/wikic/wikic/blob/master/LICENSE
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
