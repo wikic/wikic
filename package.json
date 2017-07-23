@@ -67,7 +67,8 @@
     "example": "example"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": ["/node_modules/", "/helpers/"]
   },
   "keywords": [
     "wikic",
