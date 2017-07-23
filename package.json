@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "a simple static site generator",
   "main": "lib/wikic/index.js",
   "bin": {
@@ -22,7 +22,6 @@
   "dependencies": {
     "chokidar": "^1.6.1",
     "commander": "^2.9.0",
-    "event-emitter": "github:dgeibi/event-emitter",
     "find-parent-dir": "^0.3.0",
     "front-matter": "^2.1.2",
     "fs-extra": "^3.0.1",
