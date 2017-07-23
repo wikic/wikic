@@ -1,6 +1,6 @@
 {
   "name": "wikic",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "a simple static site generator",
   "main": "lib/wikic/index.js",
   "bin": {
@@ -16,12 +16,13 @@
     "pretest": "npm run lint",
     "test": "jest",
     "test:coverage": "npm test -- --coverage",
-    "prepublish": "npm test && npm run format",
+    "prepublishOnly": "npm test && npm run format",
     "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "chokidar": "^1.6.1",
     "commander": "^2.9.0",
+    "event-emitter": "github:dgeibi/event-emitter",
     "find-parent-dir": "^0.3.0",
     "front-matter": "^2.1.2",
     "fs-extra": "^3.0.1",
@@ -68,7 +69,10 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testPathIgnorePatterns": ["/node_modules/", "/helpers/"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/helpers/"
+    ]
   },
   "keywords": [
     "wikic",
