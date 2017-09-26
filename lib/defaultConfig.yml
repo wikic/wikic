@@ -22,7 +22,11 @@ port: 4000
 # static server port
 
 excludes: []
-# directories and files to ignore, support glob, relative to `root`
+# directories and files to ignore for both public and watch, support glob, relative to `root`
+
+publicExcludes: []
+
+watchExcludes: []
 
 typeMap: {}
 # map from dirname to typeName

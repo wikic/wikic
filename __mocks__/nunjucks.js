@@ -4,10 +4,10 @@ const configure = jest.fn(() => {
     addFilter: jest.fn(() => this),
     render: jest.fn(() => ''),
     renderString: jest.fn(() => ''),
-  };
-  return renderer;
-});
+  }
+  return renderer
+})
 
-const renderString = jest.fn(() => '');
+const renderString = jest.fn(() => '')
 
-module.exports = { configure, renderString };
+module.exports = { configure, renderString }
