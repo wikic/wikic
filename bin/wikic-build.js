@@ -13,7 +13,6 @@ program
   .option('-o, --output <dir>', 'change public dir')
   .option('-p, --port <number>', 'change server port')
   .parse(process.argv)
-
 ;(async () => {
   const config = {}
   if (program.output) config.publicPath = path.resolve(program.output)
