@@ -16,6 +16,7 @@
     "pretest": "npm run lint",
     "test": "jest",
     "test:coverage": "npm test -- --coverage",
+    "test:watch": "npm test -- --watch",
     "prepublishOnly": "npm test && npm run format",
     "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
   },
@@ -32,7 +33,6 @@
     "html-toc": "^2.0.0",
     "import-from": "^2.1.0",
     "js-yaml": "^3.8.3",
-    "live-server": "^1.2.0",
     "lodash": "^4.17.4",
     "markdown-it": "^8.3.1",
     "nunjucks": "^3.0.0",

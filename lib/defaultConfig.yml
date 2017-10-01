@@ -19,7 +19,10 @@ baseurl: ''
 # site base URL
 
 port: 4000
-# liveServer port
+# server port
+
+server: null
+# Function(config, publicPath) | string (module id)
 
 excludes: []
 # directories and files to ignore for both public and watch, support glob, relative to `root`
@@ -44,13 +47,6 @@ logger:
 # https://github.com/winstonjs/winston#logging-levels
   file: verbose
   console: verbose
-
-liveServer:
-  mount: []
-  logLevel: 1
-  open: true # true | false | url
-  # Setting to `true` will make liveServer open /`baseurl` in browser
-  # See more params https://github.com/tapio/live-server/blob/master/README.md
 
 # toc:
 #   # See https://github.com/jonschlinkert/html-toc#options
