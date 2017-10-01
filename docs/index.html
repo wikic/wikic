@@ -38,6 +38,7 @@
 <ul>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#configuration-and-front-matter">Configuration and Front Matter</a></li>
+<li><a href="#dev-server">Dev Server</a></li>
 <li><a href="#layouts">Layouts</a>
 <ul>
 <li><a href="#variables-in-layouts">Variables in Layouts</a></li>
@@ -138,6 +139,12 @@ npm install --save wikic
 <span class="hljs-attr">layout:</span> <span class="hljs-string">docs</span> <span class="hljs-comment"># set layout for this page</span>
 <span class="hljs-meta">---</span>
 </code></pre>
+<h3 id="dev-server">Dev Server<a class="anchor" href="#dev-server"></a></h3>
+<p>You should use a server extension to run <code>wikic build -s</code>.</p>
+<p>Server extension Example:</p>
+<ul>
+<li><a href="https://www.npmjs.com/package/wikic-live-server">wikic-live-server</a></li>
+</ul>
 <h3 id="layouts">Layouts<a class="anchor" href="#layouts"></a></h3>
 <p>You can create <a href="https://mozilla.github.io/nunjucks/templating.html">Nunjucks</a> templates (extname is <code>.njk</code>) in <code>layoutPath</code>.</p>
 <p>In order to specify default layout for markdowns in a specific path, create a <code>_config.yml</code> in the path and add lines to it:</p>

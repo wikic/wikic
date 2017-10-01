@@ -23,6 +23,7 @@ a simple static site generator
   - [Getting started](#getting-started)
     - [Installation](#installation)
     - [Configuration and Front Matter](#configuration-and-front-matter)
+    - [Dev Server](#dev-server)
     - [Layouts](#layouts)
       - [Variables in Layouts](#variables-in-layouts)
       - [Builtin Filters](#builtin-filters)
@@ -146,6 +147,14 @@ toc: false # disable toc for this page
 layout: docs # set layout for this page
 ---
 ```
+
+### Dev Server
+
+You should use a server extension to run `wikic build -s`.
+
+Server extension Example:
+
+- [wikic-live-server](https://www.npmjs.com/package/wikic-live-server)
 
 ### Layouts
 
