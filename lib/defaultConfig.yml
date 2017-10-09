@@ -75,3 +75,14 @@ logger:
 #   highlight: # Function, use highlight.js
 
 # suites: [] # Array<string(module id)|object|function(config,Wikic)>
+
+# watchHandlers:
+#  # values are matchers in https://www.npmjs.com/package/anymatch
+#  # see defaults in lib/wikic/index.js watch()
+#
+#  setupAndBuild: #<matchers>
+#  # run wikic.setup().build()
+#  # which receives new config and then rebuild
+#
+#  build: #<matchers>           # run wikic.build()
+#  buildStaticFile: #<matchers> # build the static file which changed
