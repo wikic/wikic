@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier-eslint --write '{lib,__mocks__,bin,example}/**/*.js'",
-    "build": "cp README.md example/index.md && node ./bin/wikic.js build -c -o docs -d example",
+    "build": "node ./bin/wikic.js build -c -o docs -d example",
     "pretest": "npm run lint",
     "test": "jest",
     "test:coverage": "npm test -- --coverage",

@@ -30,6 +30,7 @@ a simple static site generator
       - [Nunjucks in Markdown](#nunjucks-in-markdown)
     - [Filter](#filter)
     - [Suite](#suite)
+    - [Watch handlers](#watch-handlers)
   - [Thanks](#thanks)
   - [API](#api)
   - [LICENSE](#license)
@@ -310,6 +311,61 @@ module.exports = {
 ```
 
 You can also use `wikic.registerSuite(suite)` to add suites.
+
+### Watch handlers
+
+**Built-in handlers**
+
+Three built-in handlers:
+
+- `setupAndBuild`: Receives new config and then rebuild
+- `build`: Rebuild the whole site
+- `buildStaticFile`: When a static file changed which wasn't ignored by `config.excludes` or `config.publicExcludes`, build the static file (copy or generate html) and execute `afterBuild` filter
+
+You can set their values to matchers in [anymatch](https://www.npmjs.com/package/anymatch).
+
+The default value is like following `wikic.config.js`
+
+``` js
+module.exports = {
+  watchHandlers: {
+    setupAndBuild: ['**/wikic.config.js', '**/_config.yml'],
+    build: [`${config.layoutPath}/**`, `${config.docsPath}/**`],
+    buildStaticFile: '**/*',
+  },
+}
+```
+
+**Custom handlers**
+
+You can add handlers for files that won't be handled by built-in handlers like the example:
+
+``` js
+module.exports = {
+  publicExcludes: ['sw-template.js'],
+
+  watchHandlers: {
+    custom: {
+      sw: {
+        matcher: ['sw-template.js'],
+        handler: (filePath, wikic) => {
+          try {
+            genSW(wikic.publicPath)
+          } catch(err) {
+            console.log('oops, something wrong when generating sw.js')
+            return false
+            // Return false to find a next matched handler
+          }
+        },
+      },
+    },
+  },
+}
+```
+
+**Priority**
+
+The order of finding handler: `setupAndBuild` > `build` > `buildStaticFile` > `custom`
 
 ## Thanks
 

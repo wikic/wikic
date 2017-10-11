@@ -48,6 +48,7 @@
 </li>
 <li><a href="#filter">Filter</a></li>
 <li><a href="#suite">Suite</a></li>
+<li><a href="#watch-handlers">Watch handlers</a></li>
 </ul>
 </li>
 <li><a href="#thanks">Thanks</a></li>
@@ -272,6 +273,49 @@ Tips: get typeNames array <code>{{ page.types | typeMaps }}</code></li>
 };
 </code></pre>
 <p>You can also use <code>wikic.registerSuite(suite)</code> to add suites.</p>
+<h3 id="watch-handlers">Watch handlers<a class="anchor" href="#watch-handlers"></a></h3>
+<p><strong>Built-in handlers</strong></p>
+<p>Three built-in handlers:</p>
+<ul>
+<li><code>setupAndBuild</code>: Receives new config and then rebuild</li>
+<li><code>build</code>: Rebuild the whole site</li>
+<li><code>buildStaticFile</code>: When a static file changed which wasn&apos;t ignored by <code>config.excludes</code> or <code>config.publicExcludes</code>, build the static file (copy or generate html) and execute <code>afterBuild</code> filter</li>
+</ul>
+<p>You can set their values to matchers in <a href="https://www.npmjs.com/package/anymatch">anymatch</a>.</p>
+<p>The default value is like following <code>wikic.config.js</code></p>
+<pre class="hljs"><code><span class="hljs-built_in">module</span>.exports = {
+  <span class="hljs-attr">watchHandlers</span>: {
+    <span class="hljs-attr">setupAndBuild</span>: [<span class="hljs-string">&apos;**/wikic.config.js&apos;</span>, <span class="hljs-string">&apos;**/_config.yml&apos;</span>],
+    <span class="hljs-attr">build</span>: [<span class="hljs-string">`<span class="hljs-subst">${config.layoutPath}</span>/**`</span>, <span class="hljs-string">`<span class="hljs-subst">${config.docsPath}</span>/**`</span>],
+    <span class="hljs-attr">buildStaticFile</span>: <span class="hljs-string">&apos;**/*&apos;</span>,
+  },
+}
+</code></pre>
+<p><strong>Custom handlers</strong></p>
+<p>You can add handlers for files that won&apos;t be handled by built-in handlers like the example:</p>
+<pre class="hljs"><code><span class="hljs-built_in">module</span>.exports = {
+  <span class="hljs-attr">publicExcludes</span>: [<span class="hljs-string">&apos;sw-template.js&apos;</span>],
+
+  <span class="hljs-attr">watchHandlers</span>: {
+    <span class="hljs-attr">custom</span>: {
+      <span class="hljs-attr">sw</span>: {
+        <span class="hljs-attr">matcher</span>: [<span class="hljs-string">&apos;sw-template.js&apos;</span>],
+        <span class="hljs-attr">handler</span>: <span class="hljs-function">(<span class="hljs-params">filePath, wikic</span>) =&gt;</span> {
+          <span class="hljs-keyword">try</span> {
+            genSW(wikic.publicPath)
+          } <span class="hljs-keyword">catch</span>(err) {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&apos;oops, something wrong when generating sw.js&apos;</span>)
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+            <span class="hljs-comment">// Return false to find a next matched handler</span>
+          }
+        },
+      },
+    },
+  },
+}
+</code></pre>
+<p><strong>Priority</strong></p>
+<p>The order of finding handler: <code>setupAndBuild</code> &gt; <code>build</code> &gt; <code>buildStaticFile</code> &gt; <code>custom</code></p>
 <h2 id="thanks">Thanks<a class="anchor" href="#thanks"></a></h2>
 <ul>
 <li><a href="https://github.com/hexojs/hexo">hexojs/hexo</a></li>
