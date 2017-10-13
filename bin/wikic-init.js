@@ -32,6 +32,7 @@ const copySrcDir = path.resolve(__dirname, '../example')
 
 initDir = path.resolve(initDir)
 fse.copySync(copySrcDir, initDir)
+fse.copySync(path.resolve(__dirname, '../README.md'), path.join(initDir, 'index.md'))
 
 logger.verbose(
   `Init ${initDir} done
