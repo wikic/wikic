@@ -238,12 +238,13 @@ The context returned by the filter will be passed to next one.
 - `afterRead`: invoked after reading each markdown file.
 - `beforeWrite`: invoked before writing each markdown file.
 - `beforeRender`: invoked before rendering each markdown file.
+- `beforeWriteAsset`: invoked before writing each asset.
 
 The context may contains the following properties:
 
 - `src`: string, absolute path of source
 - `dist`: string, absolute path of destination
-- `data`: string, content of document
+- `data`: string, content of document; `Buffer`, for assets
 - `site`: `Object`, site config
 - `page`: `Object`, page config
 - `renderContext`: `Object`, nunjucks render context, contains [variables](#variables-in-layouts)

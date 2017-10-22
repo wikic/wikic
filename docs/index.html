@@ -211,12 +211,13 @@ Tips: get typeNames array <code>{{ page.types | typeMaps }}</code></li>
 <li><code>afterRead</code>: invoked after reading each markdown file.</li>
 <li><code>beforeWrite</code>: invoked before writing each markdown file.</li>
 <li><code>beforeRender</code>: invoked before rendering each markdown file.</li>
+<li><code>beforeWriteAsset</code>: invoked before writing each asset.</li>
 </ul>
 <p>The context may contains the following properties:</p>
 <ul>
 <li><code>src</code>: string, absolute path of source</li>
 <li><code>dist</code>: string, absolute path of destination</li>
-<li><code>data</code>: string, content of document</li>
+<li><code>data</code>: string, content of document; <code>Buffer</code>, for assets</li>
 <li><code>site</code>: <code>Object</code>, site config</li>
 <li><code>page</code>: <code>Object</code>, page config</li>
 <li><code>renderContext</code>: <code>Object</code>, nunjucks render context, contains <a href="#variables-in-layouts">variables</a></li>
