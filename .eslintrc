@@ -2,8 +2,9 @@
   "env": {
     "jest": true
   },
-  "extends": "dgeibi",
+  "extends": ["dgeibi", "prettier"],
   "rules": {
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "global-require":"off"
   }
 }
