@@ -13,7 +13,7 @@ let initDir
 
 program
   .arguments('<dir>')
-  .action((dir) => {
+  .action(dir => {
     initDir = dir
   })
   .parse(process.argv)

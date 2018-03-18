@@ -11,49 +11,47 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "format": "prettier-eslint --write '{lib,__mocks__,bin,example}/**/*.js'",
+    "format": "prettier --ignore-path ./.gitignore --write \"{lib,__mocks__,bin,example}/**/*.js\"",
     "build": "node ./bin/wikic.js build -c -o docs -d example",
     "test": "jest",
     "test:coverage": "npm test -- --coverage --collectCoverageFrom=lib/**/*.js --collectCoverageFrom=!lib/utils/uncache/**",
     "test:watch": "npm test -- --watch",
     "prepublishOnly": "npm test && npm run format",
-    "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
+    "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
+    "precommit": "lint-staged"
   },
   "dependencies": {
-    "anymatch": "^1.3.2",
-    "chokidar": "^1.6.1",
-    "commander": "^2.9.0",
+    "anymatch": "^2.0.0",
+    "chokidar": "^2.0.0",
+    "commander": "^2.15.0",
     "find-parent-dir": "^0.3.0",
-    "front-matter": "^2.1.2",
-    "fs-extra": "^4.0.2",
-    "get-port": "^3.1.0",
-    "github-slugger": "^1.1.1",
-    "glob": "^7.1.1",
-    "highlight.js": "^9.10.0",
+    "front-matter": "^2.3.0",
+    "fs-extra": "^5.0.0",
+    "get-port": "^3.2.0",
+    "github-slugger": "^1.2.0",
+    "glob": "^7.1.2",
+    "highlight.js": "^9.12.0",
     "html-toc": "^2.0.0",
     "import-from": "^2.1.0",
-    "js-yaml": "^3.8.3",
-    "lodash": "^4.17.4",
-    "markdown-it": "^8.3.1",
-    "nunjucks": "^3.0.0",
+    "js-yaml": "^3.11.0",
+    "lodash": "^4.17.5",
+    "markdown-it": "^8.4.1",
+    "nunjucks": "^3.1.2",
     "title-case": "^2.1.1",
-    "winston": "^2.3.1"
+    "winston": "^2.4.1"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.1",
-    "babel-jest": "^22.1.0",
-    "babel-preset-env": "^1.6.1",
+    "@babel/core": "^7.0.0-beta.42",
+    "@babel/preset-env": "^7.0.0-beta.42",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^22.4.1",
     "coveralls": "^2.13.1",
-    "eslint": "^4.0.0",
-    "eslint-config-airbnb-base": "^12.0.0",
-    "eslint-config-dgeibi": "^4.0.0",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-import": "^2.7.0",
-    "jest": "^22.1.1",
-    "jest-plugin-fs": "^2.6.0",
-    "jest-plugins": "^2.6.0",
-    "prettier-eslint-cli": "^4.3.2"
+    "eslint": "^4.19.0",
+    "eslint-config-dgeibi": "^4.1.0",
+    "husky": "^0.14.3",
+    "jest": "^22.4.2",
+    "lint-staged": "^7.0.0",
+    "prettier": "^1.11.1"
   },
   "engines": {
     "node": ">=8.1.3"
@@ -92,5 +90,20 @@
     "singleQuote": true,
     "trailingComma": "es5",
     "printWidth": 100
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "eslint",
+      "git add"
+    ],
+    "*.md": [
+      "prettier --write",
+      "git add"
+    ],
+    ".*rc": [
+      "prettier --parser json --write",
+      "git add"
+    ]
   }
 }
