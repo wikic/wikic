@@ -73,6 +73,14 @@ logger:
 #   linkify: true
 #   typography: true
 #   highlight: # Function, use highlight.js
+#
+#   # wikic only opts here:
+#   
+#   disableBuiltInPlugins: false,
+#   # whether disable default plugins loaded by wikic, such as `markdown-it-prism`
+#   
+#   getInstance: #Function
+#   # will be called with markdownIt instance, we can load plugins here
 
 # suites: [] # Array<string(module id)|object|function(config,Wikic)>
 

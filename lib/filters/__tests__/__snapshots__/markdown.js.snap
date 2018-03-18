@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mdFilter can disable builtin plugin 1`] = `
+"<pre><code class=\\"language-javascript\\">if(true) console.log(&quot;yes&quot;)
+</code></pre>
+"
+`;
+
+exports[`mdFilter do not exist if not find lang 1`] = `
+"<pre class=\\"language-_a__kindoflang\\"><code class=\\"language-_a__kindoflang\\">o_0 ha?
+</code></pre>
+"
+`;
+
+exports[`mdFilter should render codeblock 1`] = `
+"<pre class=\\"language-javascript\\"><code class=\\"language-javascript\\"><span class=\\"token keyword\\">if</span><span class=\\"token punctuation\\">(</span><span class=\\"token boolean\\">true</span><span class=\\"token punctuation\\">)</span> console<span class=\\"token punctuation\\">.</span><span class=\\"token function\\">log</span><span class=\\"token punctuation\\">(</span><span class=\\"token string\\">\\"yes\\"</span><span class=\\"token punctuation\\">)</span>
+</code></pre>
+"
+`;
