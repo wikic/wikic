@@ -1,10 +1,6 @@
 {
+  "extends": ["dgeibi/node"],
   "env": {
     "jest": true
-  },
-  "extends": ["dgeibi"],
-  "rules": {
-    "no-underscore-dangle": "off",
-    "global-require": "off"
   }
 }
