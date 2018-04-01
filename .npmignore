@@ -9,3 +9,4 @@ __snapshots__
 *.test.js
 _test_res_
 /example/index.md
+/lib/utils/uncache/uncacheTest.js
