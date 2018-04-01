@@ -1,3 +1,8 @@
+/*
+!/lib
+!/example/
+!/README.md
+!/bin
 node_modules
 __tests__
 __snapshots__
