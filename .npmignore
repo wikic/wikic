@@ -1,0 +1,6 @@
+node_modules
+__tests__
+__snapshots__
+*.test.js
+_test_res_
+/example/index.md

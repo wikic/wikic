@@ -82,27 +82,27 @@
 <span class="token comment">#    -p, --port &lt;number&gt;  change server port</span>
 </code></pre>
 <h3 id="node-module">Node module<a class="anchor" href="#node-module"></a></h3>
-<pre class="language-javascript"><code class="language-javascript"><span class="token keyword">const</span> htmlclean <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&apos;htmlclean&apos;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">const</span> Wikic <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&apos;wikic&apos;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">const</span> docslist <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&apos;wikic-suite-docslist&apos;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class="language-javascript"><code class="language-javascript"><span class="token keyword">const</span> htmlclean <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&apos;htmlclean&apos;</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> Wikic <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&apos;wikic&apos;</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> docslist <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&apos;wikic-suite-docslist&apos;</span><span class="token punctuation">)</span>
 
-<span class="token keyword">const</span> wikic <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Wikic</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> wikic <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Wikic</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token comment">// add filter to minify html before write</span>
 wikic<span class="token punctuation">.</span>filter<span class="token punctuation">.</span><span class="token function">register</span><span class="token punctuation">(</span><span class="token string">&apos;beforeWrite&apos;</span><span class="token punctuation">,</span> <span class="token keyword">function</span> <span class="token function">minify</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>context<span class="token punctuation">.</span>data<span class="token punctuation">)</span> <span class="token keyword">return</span> context<span class="token punctuation">;</span>
-  context<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">htmlclean</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">return</span> context<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>context<span class="token punctuation">.</span>data<span class="token punctuation">)</span> <span class="token keyword">return</span> context
+  context<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">htmlclean</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+  <span class="token keyword">return</span> context
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
 
 <span class="token comment">// add suite to provide `list` variable</span>
-wikic<span class="token punctuation">.</span><span class="token function">registerSuite</span><span class="token punctuation">(</span>docslist<span class="token punctuation">)</span><span class="token punctuation">;</span>
+wikic<span class="token punctuation">.</span><span class="token function">registerSuite</span><span class="token punctuation">(</span>docslist<span class="token punctuation">)</span>
 
 <span class="token comment">// build the site and start watcher and server to debug or preview</span>
 wikic
   <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> wikic<span class="token punctuation">.</span><span class="token function">watch</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> wikic<span class="token punctuation">.</span><span class="token function">serve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> wikic<span class="token punctuation">.</span><span class="token function">serve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 </code></pre>
 <h2 id="getting-started">Getting started<a class="anchor" href="#getting-started"></a></h2>
 <h3 id="installation">Installation<a class="anchor" href="#installation"></a></h3>
@@ -113,25 +113,30 @@ wikic
 <span class="token function">npm</span> <span class="token function">install</span> --save wikic
 </code></pre>
 <h3 id="configuration-and-front-matter">Configuration and Front Matter<a class="anchor" href="#configuration-and-front-matter"></a></h3>
-<p>Default Config: <a href="https://github.com/wikic/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a></p>
-<p>You can create <code>_config.yml</code>s or a <code>wikic.config.js</code> to override defaultConfig.</p>
-<p>Here are inheritance chains of configuration:</p>
+<p>There is a default config <a href="https://github.com/wikic/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a>. We can create <code>_config.yml</code>s or a <code>wikic.config.js</code> to override it.</p>
+<p>There are two kinds of configuration, root config and sub config. A root config must be a <code>wikic.config.js</code> or a <code>_config.yml</code> in the working directory of a build (aka <code>wikic.cwd</code>). A sub config must be a <code>_config.yml</code> in the subdirectory of <code>wikic.cwd</code>.</p>
+<p>Not all options work in sub configs and we can use some of the options such as</p>
 <ul>
-<li><a href="https://github.com/wikic/wikic/blob/master/lib/defaultConfig.yml">lib/defaultConfig.yml</a>, <code>_config.yml</code> and <code>wikic.config.js</code> (in <code>wikic.cwd</code>) =&gt; <code>wikic.config</code></li>
-<li><code>wikic.config</code>, <code>_config.yml</code> (subdirectory of <code>wikic.cwd</code>, closest to markdown file) =&gt; <code>context.site</code></li>
-<li><code>context.page</code>, <code>context.site.page</code>, Front Matter in markdown =&gt; <code>context.page</code></li>
+<li><code>title</code></li>
+<li><code>page</code></li>
+<li>options that <a href="#filter">Filter</a>s use, such as <code>toc</code>, <code>markdownIt</code> and <code>toc</code></li>
 </ul>
-<p>The <code>_config.yml</code> and <code>wikic.config.js</code> in <code>wikic.cwd</code> will be loaded as <code>wikic.config</code>.</p>
-<p>The <code>_config.yml</code> closest to markdown will be merged into <code>context.site</code>.</p>
-<p>Front Matter in each markdown will be merged into <code>context.page</code> respectively.</p>
-<p><strong>Note</strong>: In <code>wikic.cwd</code>, <code>wikic.config.js</code> &gt; <code>_config.yml</code></p>
+<p>There are inheritance chains of configuration:</p>
+<ul>
+<li>root config = <code>_config.yml</code>(in the <code>wikic.cwd</code>) + <code>wikic.config.js</code>(in the <code>wikic.cwd</code>)</li>
+<li>sub config = <code>_config.yml</code> (closest to markdown file, in the subdirectory of <code>wikic.cwd</code>)</li>
+<li><code>wikic.config</code> = <a href="https://github.com/wikic/wikic/blob/master/lib/defaultConfig.yml">defaultConfig.yml</a> + root config</li>
+<li><code>context.site</code> = <code>wikic.config</code> + a sub config</li>
+<li><code>context.page</code> = <code>context.page</code> + <code>context.site.page</code> + Front Matter in markdown</li>
+</ul>
+<p>See <a href="#filter">Filter</a> for details of <code>context</code>.</p>
 <p><strong><code>wikic.config.js</code> Example</strong>:</p>
 <pre class="language-javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
   title<span class="token punctuation">:</span> <span class="token string">&apos;Wikic&apos;</span><span class="token punctuation">,</span>
   toc<span class="token punctuation">:</span> <span class="token punctuation">{</span>
     selectors<span class="token punctuation">:</span> <span class="token string">&apos;h2, h3, h4&apos;</span><span class="token punctuation">,</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p><strong>Front Matter example</strong>:</p>
 <pre class="language-yaml"><code class="language-yaml"><span class="token punctuation">---</span>
@@ -141,18 +146,18 @@ wikic
 <span class="token punctuation">---</span>
 </code></pre>
 <h3 id="dev-server">Dev Server<a class="anchor" href="#dev-server"></a></h3>
-<p>You should use a server extension to run <code>wikic build -s</code>.</p>
+<p>We should use a server extension to run <code>wikic build -s</code>.</p>
 <p>Server extension Example:</p>
 <ul>
 <li><a href="https://www.npmjs.com/package/wikic-live-server">wikic-live-server</a></li>
 </ul>
 <h3 id="layouts">Layouts<a class="anchor" href="#layouts"></a></h3>
-<p>You can create <a href="https://mozilla.github.io/nunjucks/templating.html">Nunjucks</a> templates (extname is <code>.njk</code>) in <code>layoutPath</code>.</p>
+<p>We can create <a href="https://mozilla.github.io/nunjucks/templating.html">Nunjucks</a> templates (extname is <code>.njk</code>) in <code>layoutPath</code>.</p>
 <p>In order to specify default layout for markdowns in a specific path, create a <code>_config.yml</code> in the path and add lines to it:</p>
 <pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">page</span><span class="token punctuation">:</span>
   <span class="token key atrule">layout</span><span class="token punctuation">:</span> customLayout
 </code></pre>
-<p>Also, you can set <code>layout</code> in Front Matter for a specific markdown.</p>
+<p>Also, we can set <code>layout</code> in Front Matter for a specific markdown.</p>
 <h4 id="variables-in-layouts">Variables in Layouts<a class="anchor" href="#variables-in-layouts"></a></h4>
 <ul>
 <li><code>site</code>, <code>Object</code>, reference to <code>context.site</code></li>
@@ -189,15 +194,16 @@ Tips: get typeNames array <code>{{ page.types | typeMaps }}</code></li>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">&gt;</span></span>{{ page.title }}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">&gt;</span></span>
 </code></pre>
 <h3 id="filter">Filter<a class="anchor" href="#filter"></a></h3>
-<pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token function-variable function">filter</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>context<span class="token punctuation">,</span> wikic<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token keyword">const</span> newContext <span class="token operator">=</span> Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token function-variable function">filter</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> wikic<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> newContext <span class="token operator">=</span> Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> context<span class="token punctuation">)</span>
   <span class="token comment">// do something with newContext</span>
-  <span class="token keyword">return</span> newContext<span class="token punctuation">;</span>
+  <span class="token keyword">return</span> newContext
 <span class="token punctuation">}</span>
 </code></pre>
 <p>A &apos;filter&apos; is a <code>Function</code>, which receives a <code>context</code> and the <code>wikic</code> and returns a <code>context</code>.</p>
-<p>The context returned by the filter will be passed to next one.</p>
+<p>The context returned by the filter will be passed to next filter.</p>
 <p><strong>context</strong></p>
+<p>A <code>context</code> is corresponding to a build of a markdown file.</p>
 <p><code>context</code> of the following types of filter is <code>null</code></p>
 <ul>
 <li><code>afterReadAllDocs</code>: after reading all docs, before writing all docs.</li>
@@ -223,7 +229,7 @@ Tips: get typeNames array <code>{{ page.types | typeMaps }}</code></li>
 <li><code>renderContext</code>: <code>Object</code>, nunjucks render context, contains <a href="#variables-in-layouts">variables</a></li>
 <li><code>IS_DOC</code>: boolean, whether in <code>docsPath</code></li>
 </ul>
-<p>You can use <code>wikic.filter.register(type, filter)</code> to register filters.</p>
+<p>We can use <code>wikic.filter.register(type, filter)</code> to register filters.</p>
 <h3 id="suite">Suite<a class="anchor" href="#suite"></a></h3>
 <p>A suite should be a combination of filters.</p>
 <p>It should be</p>
@@ -239,41 +245,41 @@ Tips: get typeNames array <code>{{ page.types | typeMaps }}</code></li>
 <pre class="language-js"><code class="language-js">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
   suites<span class="token punctuation">:</span> <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      beforeBuild<span class="token punctuation">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        console<span class="token punctuation">.</span><span class="token function">time</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      beforeBuild<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">time</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span>
       <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      afterBuild<span class="token punctuation">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        console<span class="token punctuation">.</span><span class="token function">timeEnd</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
+      afterBuild<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">timeEnd</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>Use <code>Function</code></p>
 <pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token function-variable function">showBuildTime</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token comment">// if option `time` is falsy, do not add suite</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>config<span class="token punctuation">.</span>time<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>config<span class="token punctuation">.</span>time<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token keyword">null</span>
 
   <span class="token keyword">return</span> <span class="token punctuation">{</span>
-    beforeBuild<span class="token punctuation">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      console<span class="token punctuation">.</span><span class="token function">time</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    beforeBuild<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">time</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span>
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
-    afterBuild<span class="token punctuation">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      console<span class="token punctuation">.</span><span class="token function">timeEnd</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    afterBuild<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">timeEnd</span><span class="token punctuation">(</span><span class="token string">&apos;build&apos;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
   suites<span class="token punctuation">:</span> <span class="token punctuation">[</span>showBuildTime<span class="token punctuation">]</span><span class="token punctuation">,</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>Use module ID</p>
 <pre class="language-js"><code class="language-js">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
-  suites<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&apos;wikic-suite-docslist&apos;</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
+  suites<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&apos;wikic-suite-docslist&apos;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<p>You can also use <code>wikic.registerSuite(suite)</code> to add suites.</p>
+<p>We can also use <code>wikic.registerSuite(suite)</code> to add suites.</p>
 <h3 id="watch-handlers">Watch handlers<a class="anchor" href="#watch-handlers"></a></h3>
 <p><strong>Built-in handlers</strong></p>
 <p>Three built-in handlers:</p>
@@ -282,7 +288,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li><code>build</code>: Rebuild the whole site</li>
 <li><code>buildStaticFile</code>: When a static file changed which wasn&apos;t ignored by <code>config.excludes</code> or <code>config.publicExcludes</code>, build the static file (copy or generate html) and execute <code>afterBuild</code> filter</li>
 </ul>
-<p>You can set their values to matchers in <a href="https://www.npmjs.com/package/anymatch">anymatch</a>.</p>
+<p>We can set their values to matchers in <a href="https://www.npmjs.com/package/anymatch">anymatch</a>.</p>
 <p>The default value is like following <code>wikic.config.js</code></p>
 <pre class="language-js"><code class="language-js">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
   watchHandlers<span class="token punctuation">:</span> <span class="token punctuation">{</span>
@@ -293,7 +299,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">}</span>
 </code></pre>
 <p><strong>Custom handlers</strong></p>
-<p>You can add handlers for files that won&apos;t be handled by built-in handlers like the example:</p>
+<p>We can add handlers for files that won&apos;t be handled by built-in handlers like the example:</p>
 <pre class="language-js"><code class="language-js">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
   publicExcludes<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&apos;sw-template.js&apos;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 
@@ -304,7 +310,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         handler<span class="token punctuation">:</span> <span class="token punctuation">(</span>filePath<span class="token punctuation">,</span> wikic<span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
           <span class="token keyword">try</span> <span class="token punctuation">{</span>
             <span class="token function">genSW</span><span class="token punctuation">(</span>wikic<span class="token punctuation">.</span>publicPath<span class="token punctuation">)</span>
-          <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">err</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
             console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&apos;oops, something wrong when generating sw.js&apos;</span><span class="token punctuation">)</span>
             <span class="token keyword">return</span> <span class="token boolean">false</span>
             <span class="token comment">// Return false to find a next matched handler</span>
