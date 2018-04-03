@@ -21,6 +21,9 @@ baseurl: ''
 port: 4000
 # server port
 
+watch: false
+# whether to build when file changes
+
 server: null
 # Function(config, publicPath) | string (module id)
 
@@ -77,7 +80,7 @@ logger:
 #   # wikic only opts here:
 #   
 #   disableBuiltInPlugins: false,
-#   # whether disable default plugins loaded by wikic, such as `markdown-it-prism`
+#   # whether to disable default plugins loaded by wikic, such as `markdown-it-prism`
 #   
 #   getInstance: #Function
 #   # will be called with markdownIt instance, we can load plugins here

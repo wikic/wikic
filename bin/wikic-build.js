@@ -17,12 +17,12 @@ program
   const config = {}
   if (program.output) config.publicPath = path.resolve(program.output)
   if (program.port) config.port = parseInt(program.port, 10)
+  if (program.watch) config.watch = true
 
   const wikic = new Wikic(program.dir, config)
   try {
     if (program.clean) await wikic.clean()
     await wikic.build()
-    if (program.watch) wikic.watch()
     if (program.serve) await wikic.serve()
   } catch (e) {
     logger.error(e)

@@ -13,6 +13,7 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --ignore-path ./.gitignore --write \"{lib,__mocks__,bin,example}/**/*.js\"",
     "build": "node util/copy.js ./README.md example/index.md && node ./bin/wikic.js build -c -o docs -d example",
+    "watch": "node util/copy.js ./README.md example/index.md && node ./bin/wikic.js build -c -w -o docs -d example",
     "test": "jest",
     "test:coverage": "npm test -- --coverage --collectCoverageFrom=lib/**/*.js --collectCoverageFrom=!lib/utils/uncache/**",
     "test:watch": "npm test -- --watch",
