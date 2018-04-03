@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "anymatch": "^2.0.0",
-    "chokidar": "^2.0.0",
+    "chokidar": "^2.0.3",
     "commander": "^2.15.0",
     "dot-prop": "^4.2.0",
     "find-parent-dir": "^0.3.0",
