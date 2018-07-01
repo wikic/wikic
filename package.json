@@ -28,7 +28,7 @@
     "dot-prop": "^4.2.0",
     "find-parent-dir": "^0.3.0",
     "front-matter": "^2.3.0",
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^6.0.0",
     "get-port": "^3.2.0",
     "github-slugger": "^1.2.0",
     "glob": "^7.1.2",
@@ -43,17 +43,13 @@
     "winston": "^2.4.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.42",
-    "@babel/preset-env": "^7.0.0-beta.42",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^22.4.1",
-    "coveralls": "^2.13.1",
+    "coveralls": "^3.0.2",
     "eslint": "^4.19.0",
     "eslint-config-dgeibi": "^5.0.0",
     "husky": "^0.14.3",
-    "jest": "^22.4.2",
-    "jest-cli": "^23.0.0-alpha.0",
-    "lint-staged": "^7.0.0",
+    "jest": "^23.0.0",
+    "jest-cli": "^23.0.0",
+    "lint-staged": "^7.2.0",
     "prettier": "^1.11.1"
   },
   "engines": {
