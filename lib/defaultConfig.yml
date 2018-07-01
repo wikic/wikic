@@ -48,7 +48,7 @@ page:
 
 logger:
 # https://github.com/winstonjs/winston#logging-levels
-  file: verbose
+  file: warn
   console: verbose
 
 # toc:
