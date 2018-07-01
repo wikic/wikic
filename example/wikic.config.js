@@ -3,7 +3,4 @@ module.exports = {
   toc: {
     selectors: 'h2, h3, h4',
   },
-  logger: {
-    file: 'warn',
-  },
 }

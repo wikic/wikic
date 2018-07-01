@@ -5,22 +5,24 @@ h4,
 h5,
 h6,
 p,
-blockquote {
+blockquote,
+body,
+html {
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-size: 16px;
+  font-size: 1em;
   font-family: 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', Arial, sans-serif;
   line-height: 1.5;
-  margin: 10px 13px 10px 13px;
 }
 
 a {
-  color: #4078c0;
+  color: #f44336;
   text-decoration: none;
 }
+
 a img {
   border: none;
 }
@@ -35,7 +37,7 @@ h2,
 h3,
 h4,
 h5 {
-  margin-bottom: 0.4em;
+  padding: .2em 0;
 }
 
 h1 {
@@ -64,25 +66,156 @@ ol {
   margin-bottom: 0.5rem;
 }
 
-li:not(:last-of-type) {
-  margin-bottom: 2px;
-}
-
-:not(pre) > code {
-  padding: 1px 5px;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  background: #f5f2f0;
-}
-
-@media screen and (min-width: 768px) {
-  body {
-    width: 748px;
-    margin: 10px auto;
-  }
+li + li {
+  margin-top: 4px;
 }
 
 h2:hover .anchor::after,
 h3:hover .anchor::after,
 h4:hover .anchor::after {
   content: ' #';
+}
+
+/* PrismJS 1.12.2
+/**
+ * prism.js default theme for JavaScript, CSS and HTML
+ * Based on dabblet (http://dabblet.com)
+ * @author Lea Verou
+ */
+code,
+pre {
+  background: none;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre {
+  color: #2e2e2e;
+}
+
+pre::-moz-selection,
+pre ::-moz-selection,
+code::-moz-selection,
+code ::-moz-selection {
+  background: #b3d4fc;
+}
+
+pre::selection,
+pre ::selection,
+code::selection,
+code ::selection {
+  background: #b3d4fc;
+}
+
+/* Code blocks */
+pre {
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+}
+
+:not(pre) > code,
+pre {
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+}
+
+/* Inline code */
+:not(pre) > code {
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: slategray;
+}
+
+.token.punctuation {
+  color: #999;
+}
+
+.namespace {
+  opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #905;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #690;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #a67f59;
+  background: hsla(0, 0%, 100%, 0.5);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #07a;
+}
+
+.token.function,
+.token.class-name {
+  color: #dd4a68;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #e90;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.page-content {
+  color: #262626;
+  margin: 50px auto;
+  max-width: 800px;
+  padding: 0 20px;
 }

@@ -7,13 +7,12 @@
     <title>{{ page.title }}{{ " | " if page.title }}{{ site.title }}</title>
   {% endblock %}
   <link rel="stylesheet" href="{{ '/css/style.css' | baseurl | relative }}">
-  <link rel="stylesheet" href="{{ '/css/prism.css' | baseurl | relative }}">
   </head>
   <body>
-    <div class="wrapper">
+    <article class="page-content">
     {% block body %}
     {{ content | safe }}
     {% endblock %}
-    </div>
+    </article>
   </body>
 </html>

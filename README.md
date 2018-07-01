@@ -10,32 +10,27 @@ a simple static site generator
 
 ## Table of Contents
 
-<!-- TOC -->
-
-* [Wikic](#wikic)
-  * [Table of Contents](#table-of-contents)
-  * [Example](#example)
-  * [Usage](#usage)
-    * [CLI](#cli)
-      * [`wikic init`](#wikic-init)
-      * [`wikic build`](#wikic-build)
-    * [Node module](#node-module)
-  * [Getting started](#getting-started)
-    * [Installation](#installation)
-    * [Configuration and Front Matter](#configuration-and-front-matter)
-    * [Dev Server](#dev-server)
-    * [Layouts](#layouts)
-      * [Variables in Layouts](#variables-in-layouts)
-      * [Builtin Filters](#builtin-filters)
-      * [Nunjucks in Markdown](#nunjucks-in-markdown)
-    * [Filter](#filter)
-    * [Suite](#suite)
-    * [Watch handlers](#watch-handlers)
-  * [Thanks](#thanks)
-  * [API](#api)
-  * [LICENSE](#license)
-
-<!-- /TOC -->
+* [Table of Contents](#table-of-contents)
+* [Example](#example)
+* [Usage](#usage)
+  * [CLI](#cli)
+    * [`wikic init`](#wikic-init)
+    * [`wikic build`](#wikic-build)
+  * [Node module](#node-module)
+* [Getting started](#getting-started)
+  * [Installation](#installation)
+  * [Configuration and Front Matter](#configuration-and-front-matter)
+  * [Dev Server](#dev-server)
+  * [Layouts](#layouts)
+    * [Variables in Layouts](#variables-in-layouts)
+    * [Builtin Filters](#builtin-filters)
+    * [Nunjucks in Markdown](#nunjucks-in-markdown)
+  * [Filter](#filter)
+  * [Suite](#suite)
+  * [Watch handlers](#watch-handlers)
+* [Thanks](#thanks)
+* [API](#api)
+* [LICENSE](#license)
 
 ## Example
 
